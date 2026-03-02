@@ -11,7 +11,7 @@
         .status-red { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
         .status-yellow { background: rgba(234, 179, 8, 0.2); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.4); }
         .status-green { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.4); }
-        .btn-ws { transition: all 0.2s; cursor: pointer; }
+        .btn-ws { transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
         .btn-ws:active { transform: scale(0.95); }
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
@@ -147,6 +147,11 @@
                 let clse = dias <= 0 ? "status-red font-black" : (dias <= 3 ? "status-yellow font-bold" : "status-green font-bold");
                 let fechaTxt = isNaN(fechaV.getTime()) ? "ERROR" : fechaV.toISOString().split('T')[0];
 
+                // Generar los mensajes dinámicos
+                const msgAcceso = generarMensajeAcceso(c, fechaTxt);
+                const msgCobro = generarMensajeCobro(c, fechaTxt);
+                const tel = c[2].replace(/\+/g, '').replace(/\s/g, '');
+
                 html += `
                     <tr class="hover:bg-slate-800/40 transition-colors border-b border-slate-800/50 text-[10px]">
                         <td class="p-4">
@@ -160,9 +165,9 @@
                         </td>
                         <td class="p-4 text-slate-500 font-mono font-bold">${fechaTxt}</td>
                         <td class="p-4 text-center flex justify-center gap-1">
-                            <button onclick="wsAcceso('${c[0]}')" class="bg-blue-600 px-3 py-1.5 rounded text-[8px] font-black uppercase btn-ws text-white">Entrega</button>
+                            <a href="https://api.whatsapp.com/send?phone=${tel}&text=${msgAcceso}" target="_blank" class="bg-blue-600 px-3 py-1.5 rounded text-[8px] font-black uppercase btn-ws text-white">Entrega</a>
                             <button onclick="renovar('${c[0]}')" class="bg-indigo-600 px-3 py-1.5 rounded text-[8px] font-black uppercase btn-ws text-white">Renovar</button>
-                            <button onclick="wsCobro('${c[0]}')" class="bg-green-600 px-3 py-1.5 rounded text-[8px] font-black uppercase btn-ws text-white">Cobro</button>
+                            <a href="https://api.whatsapp.com/send?phone=${tel}&text=${msgCobro}" target="_blank" class="bg-green-600 px-3 py-1.5 rounded text-[8px] font-black uppercase btn-ws text-white">Cobro</a>
                         </td>
                         <td class="p-4 text-center">
                             <button onclick="eliminar('${c[0]}')" class="text-slate-800 hover:text-red-500 transition-colors">🗑️</button>
@@ -175,6 +180,14 @@
             document.getElementById('gananciaSemana').innerText = `$${gSemana.toFixed(2)}`;
             document.getElementById('gananciaMes').innerText = `$${gMes.toFixed(2)}`;
             document.getElementById('gananciaAnio').innerText = `$${gAnio.toFixed(2)}`;
+        }
+
+        function generarMensajeAcceso(c, fecha) {
+            return encodeURIComponent(`*PLANET STREAMING*\n\n⭐ *SERVICIOS ACTIVOS - ${c[1]}* ⭐\n------------------------------\n📺 *SERVICIO:* ${c[3]}\n👤 *Usuario:* ${c[6]}\n🔑 *Clave:* ${c[7]}\n👤 *Perfil:* ${c[8]}\n📌 *PIN:* ${c[9]}\n🗓️ *Vence:* ${fecha}\n------------------------------\n\n⚠️ *REGLAS IMPORTANTES:*\n- No cambiar datos de la cuenta.\n- Usar solo el perfil asignado.\n\nGracias por tu compra en *Planet Streaming* 🍿`);
+        }
+
+        function generarMensajeCobro(c, fecha) {
+            return encodeURIComponent(`Hola *${c[1]}*, te saludamos de *Planet Streaming*. Tu servicio de *${c[3]}* vence pronto (${fecha}). ¿Deseas renovar para no perder tu perfil? 🚀`);
         }
 
         async function guardarEnGoogle() {
@@ -192,8 +205,8 @@
                 pin: document.getElementById('pin').value.trim(),
                 vencimiento: document.getElementById('vencimiento').value
             };
-            if(!data.nombre || !data.vencimiento) return alert("⚠️ Nombre y Fecha son obligatorios");
-            btn.disabled = true; btn.innerText = "ENVIANDO...";
+            if(!data.nombre || !data.vencimiento) return alert("⚠️ Nombre y Fecha obligatorios");
+            btn.disabled = true; btn.innerText = "REGISTRANDO...";
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
             
             if(document.getElementById('mantenerDatos').checked) {
@@ -210,45 +223,9 @@
         }
 
         async function eliminar(id) {
-            if(!confirm("¿Borrar permanentemente?")) return;
+            if(!confirm("¿Eliminar permanentemente?")) return;
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', id: id }) });
             location.reload();
-        }
-
-        function wsAcceso(id) {
-            const c = clientesGlobal.find(x => x[0] == id);
-            const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
-            
-            const msj = `*PLANET STREAMING*%0A%0A⭐ *SERVICIOS ACTIVOS - ${c[1]}* ⭐%0A------------------------------%0A📺 *SERVICIO:* ${c[3]}%0A👤 *Usuario:* ${c[6]}%0A🔑 *Clave:* ${c[7]}%0A👤 *Perfil:* ${c[8]}%0A📌 *PIN:* ${c[9]}%0A🗓️ *Vence:* ${fechaV}%0A------------------------------%0A%0A⚠️ *REGLAS IMPORTANTES:*%0A- No cambiar datos de la cuenta.%0A- Usar solo el perfil asignado.%0A%0AGracias por tu compra en *Planet Streaming* 🍿`;
-            
-            abrirWS(c[2], msj);
-        }
-
-        function wsCobro(id) {
-            const c = clientesGlobal.find(x => x[0] == id);
-            const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
-            const msj = `Hola *${c[1]}*, te saludamos de *Planet Streaming*. Tu servicio de *${c[3]}* vence pronto (${fechaV}). ¿Deseas renovar para no perder tu perfil? 🚀`;
-            abrirWS(c[2], msj);
-        }
-
-        function abrirWS(tel, msj) {
-            const fTel = tel.replace(/\+/g, '').replace(/\s/g, '');
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            
-            if (isMobile) {
-                // MÓVIL: Intenta App Business o Normal directamente
-                const appUrl = `whatsapp://send?phone=${fTel}&text=${msj}`;
-                window.location.href = appUrl;
-                
-                // Si la App no abre, usa el link universal en la misma pestaña
-                setTimeout(() => {
-                    if (!document.hidden) window.location.href = `https://wa.me/${fTel}?text=${msj}`;
-                }, 800);
-            } else {
-                // PC: Usamos api.whatsapp.com que es el método más compatible para escritorio
-                const pcUrl = `https://api.whatsapp.com/send?phone=${fTel}&text=${msj}`;
-                window.open(pcUrl, '_blank');
-            }
         }
 
         window.onload = cargarDatos;
