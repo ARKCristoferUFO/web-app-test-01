@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Streaming Planet - Panel Pro 2026</title>
+    <title>Streaming Planet 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .loading { animation: pulse 2s infinite; }
@@ -11,13 +11,11 @@
         .status-red { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
         .status-yellow { background: rgba(234, 179, 8, 0.2); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.4); }
         .status-green { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.4); }
-        .btn-ws { transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; }
-        .btn-ws:hover { filter: brightness(1.2); transform: translateY(-1px); }
         .tabla-contenedor { overflow-x: auto; }
         table { min-width: 900px; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 p-4 font-sans text-xs">
+<body class="bg-slate-950 text-slate-100 p-4 font-sans text-[11px]">
     <div class="max-w-[1600px] mx-auto">
         
         <header class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6 font-black text-center">
@@ -45,9 +43,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div class="lg:col-span-1 bg-slate-900 p-5 rounded-2xl border border-slate-800 h-fit shadow-xl">
-                <h2 class="text-blue-400 font-bold mb-4 uppercase flex justify-between tracking-widest text-[10px]">
-                    <span>Nuevo Registro</span>
-                </h2>
+                <h2 class="text-blue-400 font-bold mb-4 uppercase tracking-widest text-[10px]">Nuevo Registro</h2>
                 <div class="space-y-3">
                     <input id="nombre" type="text" placeholder="NOMBRE CLIENTE" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold uppercase text-white outline-none">
                     <input id="telefono" type="text" placeholder="WHATSAPP (Ej: 58...)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white outline-none">
@@ -75,7 +71,7 @@
 
             <div class="lg:col-span-3 bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-slate-800">
-                    <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="Buscar por nombre o servicio..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-white outline-none">
+                    <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="Buscar cliente..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-white outline-none">
                 </div>
                 <div class="tabla-contenedor max-h-[600px]">
                     <table class="w-full text-left">
@@ -89,7 +85,7 @@
                             </tr>
                         </thead>
                         <tbody id="cuerpoTabla" class="divide-y divide-slate-800 text-white font-bold uppercase">
-                            <tr><td colspan="5" class="p-20 text-center loading uppercase font-black text-slate-700">Conectando...</td></tr>
+                            <tr><td colspan="5" class="p-20 text-center loading uppercase font-black">Conectando...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -101,17 +97,18 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbxRFID-dOQuNJcC2b74GmpYXJ9Do6w5U0yQy89IPy1Y805owu__Xce3yRI9eDBnVpjz/exec";
         let clientesGlobal = [];
 
-        // DICCIONARIO DE EMOJIS EN HEX (ANTI-ROMBOS)
-        const E = {
-            key: '\uD83D\uDD11',
-            tv: '\uD83D\uDCFA',
-            user: '\uD83D\uDC64',
-            pop: '\uD83C\uDF7F',
-            pin: '\uD83D\uDCCC',
-            alert: '\uD83D\uDEA8',
-            cal: '\uD83D\uDDD3',
-            mail: '\u2709\uFE0F',
-            star: '\u2B50'
+        // CONVERSOR DE EMOJIS A CARACTERES DE SISTEMA (Inmune a rombos)
+        const getEmoji = (code) => String.fromCodePoint(code);
+        
+        const ICON = {
+            KEY: getEmoji(128273),    // 🔑
+            TV: getEmoji(128250),     // 📺
+            USER: getEmoji(128100),   // 👤
+            POP: getEmoji(127871),    // 🍿
+            PIN: getEmoji(128204),    // 📌
+            ALERT: getEmoji(128680),  // 🚨
+            CAL: getEmoji(128197),    // 🗓️
+            MAIL: getEmoji(9993)      // ✉️
         };
 
         async function cargarDatos() {
@@ -165,24 +162,24 @@
                 let fechaTxt = isNaN(fechaV.getTime()) ? "ERROR" : fechaV.toISOString().split('T')[0];
 
                 html += `
-                    <tr class="hover:bg-slate-800/40 border-b border-slate-800/50 transition-colors">
-                        <td class="p-4 text-blue-400 font-bold uppercase">${c[1]}<br><span class="text-slate-500 text-[9px] font-black">${c[3]}</span></td>
+                    <tr class="hover:bg-slate-800/40 border-b border-slate-800/50 transition-colors text-[10px]">
+                        <td class="p-4 text-blue-400 font-bold uppercase">${c[1]}<br><span class="text-slate-500 font-black">${c[3]}</span></td>
                         <td class="p-4 text-center">
-                            <span class="px-2 py-1 rounded-full border text-[9px] uppercase font-black ${clse}">
+                            <span class="px-2 py-1 rounded-full border font-black ${clse}">
                                 ${dias <= 0 ? 'VENCIDO' : dias + ' DIAS'}
                             </span>
                         </td>
-                        <td class="p-4 text-center text-slate-500 font-mono text-[10px]">${fechaTxt}</td>
+                        <td class="p-4 text-center text-slate-500 font-mono">${fechaTxt}</td>
                         <td class="p-4 text-center space-x-1">
-                            <button onclick="wsAcceso('${c[0]}')" class="bg-blue-600 px-3 py-1.5 rounded text-[10px] font-black uppercase btn-ws shadow-md">ENTREGA</button>
-                            <button onclick="renovar('${c[0]}')" class="bg-indigo-600 px-3 py-1.5 rounded text-[10px] font-black uppercase btn-ws shadow-md">RENOVAR</button>
-                            <button onclick="wsCobro('${c[0]}')" class="bg-green-600 px-3 py-1.5 rounded text-[10px] font-black uppercase btn-ws shadow-md">COBRO</button>
+                            <button onclick="wsAcceso('${c[0]}')" class="bg-blue-600 px-3 py-1.5 rounded font-black uppercase shadow-md">Entrega</button>
+                            <button onclick="renovar('${c[0]}')" class="bg-indigo-600 px-3 py-1.5 rounded font-black uppercase shadow-md">Renovar</button>
+                            <button onclick="wsCobro('${c[0]}')" class="bg-green-600 px-3 py-1.5 rounded font-black uppercase shadow-md">Cobro</button>
                         </td>
-                        <td class="p-4 text-center"><button onclick="eliminar('${c[0]}')" class="text-slate-700 hover:text-red-500 font-bold">✖</button></td>
+                        <td class="p-4 text-center"><button onclick="eliminar('${c[0]}')" class="text-slate-700 hover:text-red-500 font-bold text-lg">✖</button></td>
                     </tr>`;
             });
 
-            tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center">No hay datos</td></tr>';
+            tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center">Sin resultados</td></tr>';
             
             document.getElementById('gananciaDia').innerText = `$${vDia.toFixed(2)}`;
             document.getElementById('costoDia').innerText = `$${cDia.toFixed(2)}`;
@@ -218,31 +215,30 @@
         }
 
         async function eliminar(id) {
-            if(!confirm("¿Eliminar?")) return;
+            if(!confirm("¿Borrar definitivamente?")) return;
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', id: id }) });
             location.reload();
         }
 
-        // --- FUNCIÓN WHATSAPP CON CÓDIGOS HEX (FALLO CERO) ---
         function wsAcceso(id) {
             const c = clientesGlobal.find(x => x[0] == id);
             const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
             
-            // Construcción del mensaje usando códigos hexadecimales
-            const msj = `${E.pin} *SERVICIOS ACTIVOS - ${c[1]}* ${E.pin}\n` +
-                        `Gracias por tu compra en *Streaming Planet*\n\n` +
-                        `------------------------------\n` +
-                        `${E.tv} *SERVICIO:* ${c[3]}\n` +
-                        `${E.mail} *Usuario:* ${c[6]}\n` +
-                        `${E.key} *Clave:* ${c[7]}\n` +
-                        `${E.user} *Perfil:* ${c[8]}\n` +
-                        `${E.pin} *PIN:* ${c[9]}\n` +
-                        `${E.cal} *Vence:* ${fechaV}\n` +
-                        `------------------------------\n\n` +
-                        `${E.alert} *REGLAS IMPORTANTES:*\n` +
-                        `- No cambiar datos de la cuenta.\n` +
-                        `- Usar solo el perfil asignado.\n` +
-                        `- Disfruta tu programación ${E.pop}`;
+            // CONSTRUCCIÓN DINÁMICA DE MENSAJE (Evita errores de lectura en el archivo)
+            let msj = ICON.PIN + " *SERVICIOS ACTIVOS - " + c[1] + "* " + ICON.PIN + "\n" +
+                      "Gracias por tu compra en *Streaming Planet*\n\n" +
+                      "------------------------------\n" +
+                      ICON.TV + " *SERVICIO:* " + c[3] + "\n" +
+                      ICON.MAIL + " *Usuario:* " + c[6] + "\n" +
+                      ICON.KEY + " *Clave:* " + c[7] + "\n" +
+                      ICON.USER + " *Perfil:* " + c[8] + "\n" +
+                      ICON.PIN + " *PIN:* " + c[9] + "\n" +
+                      ICON.CAL + " *Vence:* " + fechaV + "\n" +
+                      "------------------------------\n\n" +
+                      ICON.ALERT + " *REGLAS IMPORTANTES:*\n" +
+                      "- No cambiar datos de la cuenta.\n" +
+                      "- Usar solo el perfil asignado.\n" +
+                      "- Disfruta tu programación " + ICON.POP;
             
             abrirWS(c[2], msj);
         }
@@ -250,14 +246,14 @@
         function wsCobro(id) {
             const c = clientesGlobal.find(x => x[0] == id);
             const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
-            const msj = `Hola *${c[1]}*, saludamos de *Streaming Planet*. Tu servicio de *${c[3]}* vence el (${fechaV}). ${E.cal} ¿Deseas renovar para no perder tu perfil?`;
+            let msj = "Hola *" + c[1] + "*, te saludamos de *Streaming Planet*. Tu servicio de *" + c[3] + "* vence el (" + fechaV + "). " + ICON.CAL + " ¿Deseas renovar?";
             abrirWS(c[2], msj);
         }
 
         function abrirWS(tel, msj) {
             const fTel = tel.toString().replace(/\D/g, '');
             const msjFinal = encodeURIComponent(msj);
-            // URL limpia para forzar que el navegador no interfiera
+            // Uso de API oficial directa para PC
             const urlWeb = "https://api.whatsapp.com/send?phone=" + fTel + "&text=" + msjFinal;
             window.open(urlWeb, '_blank');
         }
