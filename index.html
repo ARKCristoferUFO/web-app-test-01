@@ -11,7 +11,7 @@
         .status-red { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
         .status-yellow { background: rgba(234, 179, 8, 0.2); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.4); }
         .status-green { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.4); }
-        .btn-ws { transition: transform 0.1s active; }
+        .btn-ws { transition: transform 0.1s; }
         .btn-ws:active { transform: scale(0.95); }
         .tabla-contenedor { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         table { min-width: 850px; }
@@ -21,23 +21,23 @@
     <div class="max-w-[1600px] mx-auto">
         
         <header class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6 font-black">
-            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 text-center">
+            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 text-center shadow-lg">
                 <p class="text-[9px] text-blue-400 uppercase mb-1">Ventas Hoy</p>
                 <p id="gananciaDia" class="text-xl">$0.00</p>
             </div>
-            <div class="bg-slate-900 p-4 rounded-2xl border border-red-900/40 text-center">
+            <div class="bg-slate-900 p-4 rounded-2xl border border-red-900/40 text-center shadow-lg">
                 <p class="text-[9px] text-red-400 uppercase mb-1">Inversión Hoy</p>
                 <p id="costoDia" class="text-xl text-red-400">$0.00</p>
             </div>
-            <div class="bg-slate-900 p-4 rounded-2xl border border-emerald-500/40 text-center">
+            <div class="bg-slate-900 p-4 rounded-2xl border border-emerald-500/40 text-center shadow-lg">
                 <p class="text-[9px] text-emerald-400 uppercase mb-1">Caja Neta Hoy</p>
                 <p id="netoDia" class="text-xl text-emerald-400">$0.00</p>
             </div>
-            <div class="bg-slate-900 p-4 rounded-2xl border border-purple-900/40 text-center">
+            <div class="bg-slate-900 p-4 rounded-2xl border border-purple-900/40 text-center shadow-lg">
                 <p class="text-[9px] text-purple-400 uppercase mb-1">Utilidad Mes</p>
                 <p id="gananciaMes" class="text-xl">$0.00</p>
             </div>
-            <div class="bg-slate-900 p-4 rounded-2xl border border-yellow-500 text-center">
+            <div class="bg-slate-900 p-4 rounded-2xl border border-yellow-500 text-center shadow-lg">
                 <p class="text-[9px] text-yellow-500 uppercase mb-1">Balance 2026</p>
                 <p id="gananciaAnio" class="text-xl text-yellow-500">$0.00</p>
             </div>
@@ -45,15 +45,15 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div class="lg:col-span-1 bg-slate-900 p-5 rounded-2xl border border-slate-800 h-fit shadow-xl">
-                <h2 class="text-blue-400 font-bold mb-4 uppercase flex justify-between">
+                <h2 class="text-blue-400 font-bold mb-4 uppercase flex justify-between tracking-widest">
                     <span>Nuevo Registro</span>
                     <label class="text-[9px] text-slate-500 flex items-center gap-1 cursor-pointer">
                         <input type="checkbox" id="mantenerDatos"> COMBO
                     </label>
                 </h2>
                 <div class="space-y-3">
-                    <input id="nombre" type="text" placeholder="NOMBRE CLIENTE" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold uppercase text-white outline-none">
-                    <input id="telefono" type="text" placeholder="WHATSAPP (Ej: 58412...)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white outline-none">
+                    <input id="nombre" type="text" placeholder="NOMBRE CLIENTE" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold uppercase text-white outline-none focus:border-blue-500">
+                    <input id="telefono" type="text" placeholder="WHATSAPP (Ej: 58412...)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white outline-none focus:border-blue-500">
                     <select id="servicio" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold text-white outline-none">
                         <option>NETFLIX</option><option>DISNEY+</option><option>MAX</option>
                         <option>PRIME VIDEO</option><option>PARAMOUNT+</option><option>IPTV</option>
@@ -72,13 +72,14 @@
                         </div>
                     </div>
                     <input id="vencimiento" type="date" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold text-white outline-none">
-                    <button onclick="guardarEnGoogle()" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-500 font-black py-3 rounded-xl uppercase transition-all">Guardar Registro</button>
+                    <button onclick="guardarEnGoogle()" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-500 font-black py-3 rounded-xl uppercase transition-all shadow-lg">Guardar Registro</button>
                 </div>
             </div>
 
             <div class="lg:col-span-3 bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
-                <div class="p-4 border-b border-slate-800">
-                    <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="Buscar cliente o servicio..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-white outline-none">
+                <div class="p-4 border-b border-slate-800 flex items-center gap-2">
+                    <span class="text-lg">\uD83D\uDCA0</span>
+                    <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="Buscar cliente o servicio..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-white outline-none focus:border-blue-500 font-medium">
                 </div>
                 <div class="tabla-contenedor max-h-[600px]">
                     <table class="w-full text-left">
@@ -86,13 +87,13 @@
                             <tr>
                                 <th class="p-4">Cliente / Servicio</th>
                                 <th class="p-4 text-center">Estado</th>
-                                <th class="p-4">Vence</th>
+                                <th class="p-4 text-center">Vence</th>
                                 <th class="p-4 text-center">Acciones</th>
-                                <th class="p-4"></th>
+                                <th class="p-4 text-center">X</th>
                             </tr>
                         </thead>
-                        <tbody id="cuerpoTabla" class="divide-y divide-slate-800 text-white">
-                            <tr><td colspan="5" class="p-20 text-center loading text-slate-600 font-bold italic text-xs uppercase">Conectando...</td></tr>
+                        <tbody id="cuerpoTabla" class="divide-y divide-slate-800 text-white font-bold uppercase">
+                            <tr><td colspan="5" class="p-20 text-center loading text-slate-600 font-bold italic text-xs uppercase">Cargando base de datos...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -155,28 +156,29 @@
                     if(fReg.getFullYear() === 2026) uAnio += gan;
                 }
 
-                let clse = dias <= 0 ? "status-red font-black" : (dias <= 3 ? "status-yellow font-bold" : "status-green font-bold");
+                let clse = dias <= 0 ? "status-red" : (dias <= 3 ? "status-yellow" : "status-green");
                 let fechaTxt = isNaN(fechaV.getTime()) ? "ERROR" : fechaV.toISOString().split('T')[0];
 
                 html += `
-                    <tr class="hover:bg-slate-800/40 border-b border-slate-800/50">
-                        <td class="p-4 font-bold uppercase text-blue-400">${c[1]}<br><span class="text-slate-500 text-[9px] font-black">${c[3]}</span></td>
+                    <tr class="hover:bg-slate-800/40 border-b border-slate-800/50 transition-colors">
+                        <td class="p-4 text-blue-400 font-bold uppercase">${c[1]}<br><span class="text-slate-500 text-[9px] font-black">${c[3]}</span></td>
                         <td class="p-4 text-center">
-                            <span class="px-2 py-1 rounded-full border text-[9px] uppercase ${clse}">
-                                ${dias <= 0 ? 'VENCIDO' : dias + ' DÍAS'}
+                            <span class="px-2 py-1 rounded-full border text-[9px] uppercase font-black ${clse}">
+                                ${dias <= 0 ? 'VENCIDO' : dias + ' D\u00CDAS'}
                             </span>
                         </td>
-                        <td class="p-4 text-slate-500 font-mono font-bold">${fechaTxt}</td>
+                        <td class="p-4 text-center text-slate-500 font-mono text-[10px]">${fechaTxt}</td>
                         <td class="p-4 text-center space-x-1">
-                            <button onclick="wsAcceso('${c[0]}')" class="bg-blue-600 px-2 py-1.5 rounded text-[9px] font-black uppercase shadow-md">Entrega</button>
-                            <button onclick="renovar('${c[0]}')" class="bg-indigo-600 px-2 py-1.5 rounded text-[9px] font-black uppercase shadow-md">Renovar</button>
-                            <button onclick="wsCobro('${c[0]}')" class="bg-green-600 px-2 py-1.5 rounded text-[9px] font-black uppercase shadow-md">Cobro</button>
+                            <button onclick="wsAcceso('${c[0]}')" class="bg-blue-600 px-2 py-1.5 rounded text-[9px] font-black uppercase btn-ws shadow-md italic">Entrega</button>
+                            <button onclick="renovar('${c[0]}')" class="bg-indigo-600 px-2 py-1.5 rounded text-[9px] font-black uppercase btn-ws shadow-md italic">Renovar</button>
+                            <button onclick="wsCobro('${c[0]}')" class="bg-green-600 px-2 py-1.5 rounded text-[9px] font-black uppercase btn-ws shadow-md italic">Cobro</button>
                         </td>
-                        <td class="p-4 text-center"><button onclick="eliminar('${c[0]}')" class="text-slate-800 hover:text-red-500 transition-colors">&#10006;</button></td>
+                        <td class="p-4 text-center"><button onclick="eliminar('${c[0]}')" class="text-slate-800 hover:text-red-500 transition-colors font-bold">&#10006;</button></td>
                     </tr>`;
             });
 
-            tabla.innerHTML = html;
+            tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center">No hay registros</td></tr>';
+            
             document.getElementById('gananciaDia').innerText = `$${vDia.toFixed(2)}`;
             document.getElementById('costoDia').innerText = `$${cDia.toFixed(2)}`;
             document.getElementById('netoDia').innerText = `$${(vDia - cDia).toFixed(2)}`;
@@ -199,51 +201,56 @@
                 pin: document.getElementById('pin').value.trim(),
                 vencimiento: document.getElementById('vencimiento').value
             };
-            btn.disabled = true; btn.innerText = "REGISTRANDO...";
+            if(!data.nombre || !data.vencimiento) return alert("Faltan datos clave");
+            btn.disabled = true; btn.innerText = "PROCESANDO...";
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-            location.reload();
+            
+            if(document.getElementById('mantenerDatos').checked) {
+                document.getElementById('costo').value = ""; document.getElementById('precio').value = "";
+                btn.disabled = false; btn.innerText = "LISTO"; cargarDatos();
+            } else { location.reload(); }
         }
 
         async function renovar(id) {
-            if(!confirm("¿Renovar 30 días?")) return;
+            if(!confirm("\u00BFProlongar servicio por 30 d\u00EDas?")) return;
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'RENEW', id: id }) });
             location.reload();
         }
 
         async function eliminar(id) {
-            if(!confirm("¿Borrar?")) return;
+            if(!confirm("\u00BFEliminar para siempre?")) return;
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', id: id }) });
             location.reload();
         }
 
-        // --- SOLUCIÓN TÉCNICA FINAL PARA EMOJIS ---
+        // --- C\u00D3DIGO DE EMOJIS BLINDADOS ---
         function wsAcceso(id) {
             const c = clientesGlobal.find(x => x[0] == id);
             const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
             
-            // Códigos de escape Hexadecimal (Blindados contra errores de texto)
-            const star = "\u2B50";     // ⭐
-            const tv = "\uD83D\uDCFA";   // 📺
-            const user = "\uD83D\uDC64"; // 👤
-            const key = "\uD83D\uDD11";  // 🔑
-            const pin = "\uD83D\uDCCC";  // 📌
-            const calendar = "\uD83D\uDDD3"; // 🗓️
-            const warn = "\u26A0\uFE0F"; // ⚠️
-            const popcorn = "\uD83C\uDF7F"; // 🍿
+            const star = "\u2B50";
+            const tv = "\uD83D\uDCFA";
+            const user = "\uD83D\uDC64";
+            const key = "\uD83D\uDD11";
+            const pin = "\uD83D\uDCCC";
+            const cal = "\uD83D\uDDD3";
+            const warn = "\u26A0\uFE0F";
+            const popcorn = "\uD83C\uDF7F";
 
             const msj = star + " *SERVICIOS ACTIVOS - " + c[1] + "* " + star + "%0A" +
+                        "Gracias por tu compra en *Streaming Planet*%0A%0A" +
                         "------------------------------%0A" +
                         tv + " *SERVICIO:* " + c[3] + "%0A" +
                         user + " *Usuario:* " + c[6] + "%0A" +
                         key + " *Clave:* " + c[7] + "%0A" +
                         user + " *Perfil:* " + c[8] + "%0A" +
                         pin + " *PIN:* " + c[9] + "%0A" +
-                        calendar + " *Vence:* " + fechaV + "%0A" +
+                        cal + " *Vence:* " + fechaV + "%0A" +
                         "------------------------------%0A%0A" +
                         warn + " *REGLAS IMPORTANTES:*%0A" +
                         "- No cambiar datos de la cuenta.%0A" +
-                        "- Usar solo el perfil asignado.%0A%0A" +
-                        "Gracias por tu compra en *Planet Streaming* " + popcorn;
+                        "- Usar solo el perfil asignado.%0A" +
+                        "- Disfruta tu programaci\u00F3n " + popcorn;
             
             abrirWS(c[2], msj);
         }
@@ -251,8 +258,8 @@
         function wsCobro(id) {
             const c = clientesGlobal.find(x => x[0] == id);
             const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
-            const rocket = "\uD83D\uDE80"; 
-            const msj = "Hola *" + c[1] + "*, te saludamos de *Planet Streaming*. Tu servicio de *" + c[3] + "* vence pronto (" + fechaV + "). " + rocket + " ¿Deseas renovar para no perder tu perfil?";
+            const rocket = "\uD83D\uDE80";
+            const msj = "Hola *" + c[1] + "*, te saludamos de *Planet Streaming*. Tu servicio de *" + c[3] + "* vence pronto (" + fechaV + "). " + rocket + " \u00BFDeseas renovar para no perder tu perfil?";
             abrirWS(c[2], msj);
         }
 
