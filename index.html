@@ -12,7 +12,7 @@
         .status-yellow { background: rgba(234, 179, 8, 0.2); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.4); }
         .status-green { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.4); }
         .btn-ws { transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; }
-        .btn-ws:hover { filter: brightness(1.2); }
+        .btn-ws:hover { filter: brightness(1.2); transform: translateY(-1px); }
         .tabla-contenedor { overflow-x: auto; }
         table { min-width: 900px; }
     </style>
@@ -53,7 +53,7 @@
                 </h2>
                 <div class="space-y-3">
                     <input id="nombre" type="text" placeholder="NOMBRE CLIENTE" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold uppercase text-white outline-none">
-                    <input id="telefono" type="text" placeholder="WHATSAPP (58...)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white outline-none">
+                    <input id="telefono" type="text" placeholder="WHATSAPP (Ej: 58...)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white outline-none">
                     <select id="servicio" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold text-white">
                         <option>NETFLIX</option><option>DISNEY+</option><option>MAX</option>
                         <option>PRIME VIDEO</option><option>PARAMOUNT+</option><option>IPTV</option>
@@ -64,7 +64,7 @@
                         <input id="precio" type="number" step="0.01" placeholder="Venta $" class="bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold text-green-400">
                     </div>
                     <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-2 text-white">
-                        <input id="correo" type="text" placeholder="Usuario" class="w-full bg-transparent border-b border-slate-800 p-1 outline-none">
+                        <input id="correo" type="text" placeholder="Usuario / Correo" class="w-full bg-transparent border-b border-slate-800 p-1 outline-none">
                         <input id="clave" type="text" placeholder="Contraseña" class="w-full bg-transparent border-b border-slate-800 p-1 outline-none">
                         <div class="grid grid-cols-2 gap-2 mt-2">
                             <input id="perfil" type="text" placeholder="Perfil" class="bg-slate-800 p-1 rounded text-[9px]">
@@ -72,13 +72,13 @@
                         </div>
                     </div>
                     <input id="vencimiento" type="date" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold text-white">
-                    <button onclick="guardarEnGoogle()" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-500 font-black py-3 rounded-xl uppercase shadow-lg">Guardar Registro</button>
+                    <button onclick="guardarEnGoogle()" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-500 font-black py-3 rounded-xl uppercase transition-all shadow-lg">Guardar Registro</button>
                 </div>
             </div>
 
             <div class="lg:col-span-3 bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-slate-800">
-                    <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="🔍 Buscar cliente..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-white outline-none">
+                    <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="🔍 Buscar por nombre o servicio..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-white outline-none">
                 </div>
                 <div class="tabla-contenedor max-h-[600px]">
                     <table class="w-full text-left">
@@ -92,7 +92,7 @@
                             </tr>
                         </thead>
                         <tbody id="cuerpoTabla" class="divide-y divide-slate-800 text-white font-bold uppercase">
-                            <tr><td colspan="5" class="p-20 text-center loading uppercase">Cargando datos...</td></tr>
+                            <tr><td colspan="5" class="p-20 text-center loading uppercase">Cargando base de datos...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -128,7 +128,6 @@
             const tabla = document.getElementById('cuerpoTabla');
             const busqueda = document.getElementById('buscador').value.toLowerCase();
             const hoy = new Date(); hoy.setHours(0,0,0,0);
-            
             let vDia = 0, cDia = 0, uMes = 0, uAnio = 0;
 
             let filtrados = clientesGlobal.filter(c => 
@@ -156,8 +155,8 @@
                 let fechaTxt = isNaN(fechaV.getTime()) ? "ERROR" : fechaV.toISOString().split('T')[0];
 
                 html += `
-                    <tr class="hover:bg-slate-800/40 border-b border-slate-800/50">
-                        <td class="p-4 text-blue-400 font-bold uppercase">${c[1]}<br><span class="text-slate-500 text-[9px]">${c[3]}</span></td>
+                    <tr class="hover:bg-slate-800/40 border-b border-slate-800/50 transition-colors">
+                        <td class="p-4 text-blue-400 font-bold uppercase">${c[1]}<br><span class="text-slate-500 text-[9px] font-black">${c[3]}</span></td>
                         <td class="p-4 text-center">
                             <span class="px-2 py-1 rounded-full border text-[9px] uppercase font-black ${clse}">
                                 ${dias <= 0 ? 'VENCIDO' : dias + ' DIAS'}
@@ -165,15 +164,15 @@
                         </td>
                         <td class="p-4 text-center text-slate-500 font-mono text-[10px]">${fechaTxt}</td>
                         <td class="p-4 text-center space-x-1">
-                            <button onclick="wsAcceso('${c[0]}')" class="bg-blue-600 px-3 py-1.5 rounded text-[10px] font-black btn-ws shadow-md uppercase">🚀 Entrega</button>
-                            <button onclick="renovar('${c[0]}')" class="bg-indigo-600 px-3 py-1.5 rounded text-[10px] font-black btn-ws shadow-md uppercase">♻️ Renovar</button>
-                            <button onclick="wsCobro('${c[0]}')" class="bg-green-600 px-3 py-1.5 rounded text-[10px] font-black btn-ws shadow-md uppercase">💰 Cobro</button>
+                            <button onclick="wsAcceso('${c[0]}')" class="bg-blue-600 px-3 py-1.5 rounded text-[10px] font-black uppercase btn-ws shadow-md">🚀 Entrega</button>
+                            <button onclick="renovar('${c[0]}')" class="bg-indigo-600 px-3 py-1.5 rounded text-[10px] font-black uppercase btn-ws shadow-md">♻️ Renovar</button>
+                            <button onclick="wsCobro('${c[0]}')" class="bg-green-600 px-3 py-1.5 rounded text-[10px] font-black uppercase btn-ws shadow-md">💰 Cobro</button>
                         </td>
                         <td class="p-4 text-center"><button onclick="eliminar('${c[0]}')" class="text-slate-700 hover:text-red-500 font-bold">✖</button></td>
                     </tr>`;
             });
 
-            tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center">Vacio</td></tr>';
+            tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center">No se encontraron registros</td></tr>';
             
             document.getElementById('gananciaDia').innerText = `$${vDia.toFixed(2)}`;
             document.getElementById('costoDia').innerText = `$${cDia.toFixed(2)}`;
@@ -203,34 +202,34 @@
         }
 
         async function renovar(id) {
-            if(!confirm("¿Renovar 30 dias?")) return;
+            if(!confirm("¿Confirmar renovación por 30 días?")) return;
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'RENEW', id: id }) });
             location.reload();
         }
 
         async function eliminar(id) {
-            if(!confirm("¿Borrar?")) return;
+            if(!confirm("¿Deseas eliminar este registro para siempre?")) return;
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', id: id }) });
             location.reload();
         }
 
-        // --- SOLUCION DEFINITIVA EMOJIS PC ---
+        // --- WHATSAPP CON TUS EMOJIS SELECCIONADOS ---
         function wsAcceso(id) {
             const c = clientesGlobal.find(x => x[0] == id);
             const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
             
-            // Usamos los emojis como texto, pero la funcion abrirWS los codificara correctamente
-            const msj = `⭐ *SERVICIOS ACTIVOS - ${c[1]}* ⭐\n` +
+            // Emojis utilizados: 🔑 📺 👤 🍿 📌 🚨 🗓️ ✉️
+            const msj = `📌 *SERVICIOS ACTIVOS - ${c[1]}* 📌\n` +
                         `Gracias por tu compra en *Streaming Planet*\n\n` +
                         `------------------------------\n` +
                         `📺 *SERVICIO:* ${c[3]}\n` +
-                        `👤 *Usuario:* ${c[6]}\n` +
+                        `✉️ *Usuario:* ${c[6]}\n` +
                         `🔑 *Clave:* ${c[7]}\n` +
                         `👤 *Perfil:* ${c[8]}\n` +
                         `📌 *PIN:* ${c[9]}\n` +
                         `🗓️ *Vence:* ${fechaV}\n` +
                         `------------------------------\n\n` +
-                        `⚠️ *REGLAS IMPORTANTES:*\n` +
+                        `🚨 *REGLAS IMPORTANTES:*\n` +
                         `- No cambiar datos de la cuenta.\n` +
                         `- Usar solo el perfil asignado.\n` +
                         `- Disfruta tu programación 🍿`;
@@ -241,20 +240,15 @@
         function wsCobro(id) {
             const c = clientesGlobal.find(x => x[0] == id);
             const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
-            const msj = `Hola *${c[1]}*, te saludamos de *Streaming Planet*. Tu servicio de *${c[3]}* vence pronto (${fechaV}). 🚀 ¿Deseas renovar para no perder tu perfil?`;
+            const msj = `Hola *${c[1]}*, te saludamos de *Streaming Planet*. Tu servicio de *${c[3]}* vence pronto (${fechaV}). 🗓️ ¿Deseas renovar para no perder tu perfil?`;
             abrirWS(c[2], msj);
         }
 
         function abrirWS(tel, msj) {
             const fTel = tel.toString().replace(/\D/g, '');
-            
-            // Esta es la parte clave: encodeURIComponent convierte los emojis en códigos
-            // que la PC puede procesar sin convertirlos en rombos.
-            const msjCodificado = encodeURIComponent(msj);
-            
-            const urlWeb = `https://wa.me/${fTel}?text=${msjCodificado}`;
-            
-            // Abrimos en pestaña nueva para asegurar compatibilidad total
+            // Codificación URL segura para que los emojis lleguen perfectos en PC
+            const msjFinal = encodeURIComponent(msj);
+            const urlWeb = `https://wa.me/${fTel}?text=${msjFinal}`;
             window.open(urlWeb, '_blank');
         }
 
