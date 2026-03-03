@@ -3,40 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Streaming Planet | Control Total</title>
+    <title>Streaming Planet | Control Total Extendido</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; color: #f8fafc; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; color: #f8fafc; margin: 0; padding: 0; }
         .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
         .card-red { border-left: 4px solid #ef4444; background: linear-gradient(to right, rgba(239, 68, 68, 0.1), transparent); }
-        .btn-action { transition: all 0.2s; font-weight: 800; text-transform: uppercase; font-size: 8px; letter-spacing: 0.5px; }
-        .btn-action:hover { filter: brightness(1.2); transform: translateY(-1px); }
+        
+        /* Botones de Gestión Estilizados */
+        .btn-mgmt { 
+            display: flex; align-items: center; gap: 4px; padding: 6px 10px; 
+            border-radius: 8px; font-size: 10px; font-weight: 800; 
+            text-transform: uppercase; transition: all 0.2s;
+        }
+        .btn-mgmt:hover { transform: translateY(-2px); filter: brightness(1.2); }
+        
+        /* Ajuste de scrollbar para la tabla */
+        .custom-scroll::-webkit-scrollbar { height: 8px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
 </head>
-<body class="p-4 md:p-6">
-    <div class="max-w-[1600px] mx-auto">
-        
-        <header class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+<body class="p-2 md:p-4">
+    <div class="w-full mx-auto"> <header class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
             <div class="glass p-4 rounded-3xl border-l-4 border-blue-500">
                 <p class="text-[9px] text-blue-400 font-bold uppercase tracking-widest">Ingresos Hoy</p>
                 <p id="ventasBrutas" class="text-xl font-extrabold mt-1">$0.00</p>
             </div>
             
-            <div class="glass p-4 rounded-3xl card-red">
+            <div class="glass p-4 rounded-2xl card-red">
                 <div class="flex justify-between items-center">
                     <p class="text-[9px] text-red-400 font-bold uppercase tracking-widest">Egresos / Costo</p>
-                    <button onclick="registrarEgresoRapido()" class="bg-red-500 text-white px-3 py-1.5 rounded-xl flex items-center gap-2 hover:bg-red-600 transition-all shadow-lg shadow-red-900/20">
-                        <i class="fas fa-plus text-[10px]"></i>
-                        <span class="text-[9px] font-black uppercase">Gasto</span>
+                    <button onclick="registrarEgresoRapido()" class="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition-all shadow-lg flex items-center gap-1">
+                        <i class="fas fa-plus text-[9px]"></i>
+                        <span class="text-[9px] font-black uppercase italic">Gasto</span>
                     </button>
                 </div>
                 <p id="egresosHoy" class="text-xl font-extrabold mt-1">$0.00</p>
             </div>
 
             <div class="glass p-4 rounded-3xl border-l-4 border-emerald-500">
-                <p class="text-[9px] text-emerald-400 font-bold uppercase tracking-widest">Caja Neta Hoy</p>
+                <p class="text-[9px] text-emerald-400 font-bold uppercase tracking-widest">Utilidad Neta Hoy</p>
                 <p id="cajaNeto" class="text-xl font-extrabold mt-1 text-emerald-400">$0.00</p>
             </div>
 
@@ -47,15 +56,15 @@
 
             <div class="glass p-4 rounded-3xl border-l-4 border-yellow-500">
                 <p class="text-[9px] text-yellow-500 font-bold uppercase tracking-widest">Balance Anual</p>
-                <p id="gananciaAnio" class="text-xl font-extrabold mt-1 text-yellow-500">$0.00</p>
+                <p id="gananciaAnio" class="text-xl font-extrabold mt-1 text-yellow-500 font-black">$0.00</p>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-3">
-                <div class="glass p-6 rounded-3xl shadow-2xl sticky top-6">
-                    <h2 class="text-xs font-black text-blue-400 uppercase tracking-widest mb-4 italic">Registro</h2>
-                    <div class="space-y-4">
+        <div class="flex flex-col lg:flex-row gap-4">
+            <div class="lg:w-1/4">
+                <div class="glass p-5 rounded-3xl shadow-2xl sticky top-4">
+                    <h2 class="text-xs font-black text-blue-400 uppercase tracking-widest mb-4 italic">Panel de Registro</h2>
+                    <div class="space-y-3">
                         <input id="nombre" type="text" placeholder="CLIENTE" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs font-bold uppercase outline-none focus:border-blue-500">
                         
                         <select id="servicio" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs font-bold uppercase outline-none">
@@ -67,38 +76,41 @@
                             <option value="YOUTUBE">YouTube</option>
                         </select>
 
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="text-[9px] text-slate-500 font-bold ml-1 italic">Costo $</label>
+                                <label class="text-[8px] text-slate-500 font-bold ml-1 italic">Costo $</label>
                                 <input id="costo" type="number" step="0.01" placeholder="0.00" class="w-full bg-slate-900 border border-red-900/30 rounded-xl p-3 text-xs outline-none text-red-400 font-bold">
                             </div>
                             <div>
-                                <label class="text-[9px] text-slate-500 font-bold ml-1 italic">Venta $</label>
+                                <label class="text-[8px] text-slate-500 font-bold ml-1 italic">Venta $</label>
                                 <input id="precio" type="number" step="0.01" placeholder="0.00" class="w-full bg-slate-900 border border-emerald-900/30 rounded-xl p-3 text-xs font-black text-emerald-400 outline-none">
                             </div>
                         </div>
 
-                        <input id="vencimiento" type="date" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs font-bold text-white">
+                        <input id="vencimiento" type="date" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs font-bold text-white outline-none">
                         
-                        <button onclick="guardarEnGoogle()" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-500 font-black py-4 rounded-xl shadow-lg uppercase text-[10px] tracking-widest transition-all">Registrar Venta</button>
+                        <button onclick="guardarEnGoogle()" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-500 font-black py-4 rounded-xl shadow-lg uppercase text-[10px] tracking-widest transition-all">Registrar Ahora</button>
                     </div>
                 </div>
             </div>
 
-            <div class="lg:col-span-9">
+            <div class="lg:w-3/4">
                 <div class="glass rounded-3xl overflow-hidden shadow-2xl">
-                    <div class="p-4 bg-white/5 flex justify-between items-center">
-                        <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="🔍 Buscar cliente o servicio..." class="w-full max-w-sm bg-slate-950 border border-slate-800 rounded-2xl px-4 py-2 text-xs outline-none focus:border-blue-500">
+                    <div class="p-4 bg-white/5 flex justify-between items-center border-b border-white/5">
+                        <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="🔍 Buscar registros..." class="w-full max-w-md bg-slate-950 border border-slate-800 rounded-2xl px-4 py-2 text-xs outline-none focus:border-blue-500">
+                        <div class="flex gap-2">
+                             <span class="text-[9px] text-slate-500 uppercase font-black">Control Operativo</span>
+                        </div>
                     </div>
-                    <div class="overflow-x-auto max-h-[650px]">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-950/50 text-slate-500 uppercase text-[9px] font-black tracking-widest sticky top-0 z-10">
+                    
+                    <div class="overflow-x-auto custom-scroll max-h-[700px]">
+                        <table class="w-full text-left min-w-[900px]"> <thead class="bg-slate-950/80 text-slate-500 uppercase text-[9px] font-black tracking-widest sticky top-0 z-20">
                                 <tr>
-                                    <th class="p-5">Cliente / Servicio</th>
-                                    <th class="p-4 text-center">Costo</th>
-                                    <th class="p-4 text-center">Precio</th>
-                                    <th class="p-4 text-center">Gestión</th>
-                                    <th class="p-4 text-right">Acción</th>
+                                    <th class="p-4">Cliente / Servicio</th>
+                                    <th class="p-4 text-center">Inversión (Costo)</th>
+                                    <th class="p-4 text-center">Ingreso (Venta)</th>
+                                    <th class="p-4 text-center">Gestión de Cuenta</th>
+                                    <th class="p-4 text-right">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="cuerpoTabla" class="divide-y divide-white/5"></tbody>
@@ -114,9 +126,11 @@
         let clientesGlobal = [];
 
         async function cargarDatos() {
-            const res = await fetch(API_URL);
-            clientesGlobal = await res.json();
-            renderizarTabla();
+            try {
+                const res = await fetch(API_URL);
+                clientesGlobal = await res.json();
+                renderizarTabla();
+            } catch(e) { console.error("Error al sincronizar datos"); }
         }
 
         function renderizarTabla() {
@@ -131,6 +145,7 @@
                 const costoFila = parseFloat(c[4]) || 0; 
                 const ventaFila = parseFloat(c[5]) || 0; 
 
+                // Cálculos Financieros
                 if(!isNaN(fReg.getTime())) {
                     const esHoy = fReg.toDateString() === hoy.toDateString();
                     const esMes = fReg.getMonth() === hoy.getMonth() && fReg.getFullYear() === 2026;
@@ -148,29 +163,35 @@
 
                 if(esEgreso) {
                     html += `
-                    <tr class="bg-red-500/5 text-[11px]">
-                        <td class="p-5 font-black text-red-400 italic" colspan="3"><i class="fas fa-minus-circle mr-2"></i> GASTO: ${c[3]}</td>
+                    <tr class="bg-red-500/10 text-[11px]">
+                        <td class="p-4 font-black text-red-400 italic" colspan="3"><i class="fas fa-minus-circle mr-2"></i> GASTO EXTRA: ${c[3]}</td>
                         <td class="p-4 text-center text-red-400 font-black">-$${ventaFila.toFixed(2)}</td>
                         <td class="p-4 text-right"><button onclick="eliminar('${c[0]}')"><i class="fas fa-trash-alt text-slate-700"></i></button></td>
                     </tr>`;
                 } else {
                     html += `
                     <tr class="hover:bg-white/5 text-[11px]">
-                        <td class="p-5">
-                            <p class="font-bold text-blue-400 uppercase leading-none">${c[1]}</p>
-                            <p class="text-[8px] text-slate-500 mt-1 uppercase font-bold">${c[3]}</p>
+                        <td class="p-4">
+                            <div class="flex flex-col">
+                                <span class="font-bold text-blue-400 uppercase leading-none text-[12px]">${c[1]}</span>
+                                <span class="text-[9px] text-slate-500 mt-1 font-bold tracking-tighter">${c[3]}</span>
+                            </div>
                         </td>
-                        <td class="p-4 text-center text-red-400/60 font-mono italic">$${costoFila.toFixed(2)}</td>
-                        <td class="p-4 text-center text-emerald-400 font-black">$${ventaFila.toFixed(2)}</td>
+                        <td class="p-4 text-center font-mono text-red-400/70 italic font-bold">$${costoFila.toFixed(2)}</td>
+                        <td class="p-4 text-center font-mono text-emerald-400 font-black text-[13px]">$${ventaFila.toFixed(2)}</td>
                         <td class="p-4">
                             <div class="flex gap-1 justify-center">
-                                <button class="btn-action bg-blue-600 text-white px-2 py-1 rounded">Entrega</button>
-                                <button class="btn-action bg-purple-600 text-white px-2 py-1 rounded">Renovar</button>
-                                <button class="btn-action bg-emerald-600 text-white px-2 py-1 rounded">Cobro</button>
+                                <button class="btn-mgmt bg-blue-600 text-white"><i class="fas fa-paper-plane"></i> Entrega</button>
+                                <button class="btn-mgmt bg-purple-600 text-white"><i class="fas fa-sync-alt"></i> Renovar</button>
+                                <button class="btn-mgmt bg-emerald-600 text-white"><i class="fas fa-dollar-sign"></i> Cobro</button>
+                                <button class="btn-mgmt bg-slate-700 text-white"><i class="fab fa-whatsapp"></i></button>
                             </div>
                         </td>
                         <td class="p-4 text-right">
-                            <button onclick="eliminar('${c[0]}')" class="text-slate-800 hover:text-red-500 transition-colors"><i class="fas fa-trash-alt"></i></button>
+                            <div class="flex gap-3 justify-end items-center">
+                                <button onclick="alert('Editar')" class="text-slate-600 hover:text-blue-400"><i class="fas fa-edit"></i></button>
+                                <button onclick="eliminar('${c[0]}')" class="text-slate-800 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
+                            </div>
                         </td>
                     </tr>`;
                 }
@@ -208,7 +229,7 @@
             location.reload();
         }
 
-        async function eliminar(id) { if(confirm("¿Borrar?")) { await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', id: id }) }); location.reload(); } }
+        async function eliminar(id) { if(confirm("¿Eliminar este registro permanentemente?")) { await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', id: id }) }); location.reload(); } }
         window.onload = cargarDatos;
     </script>
 </body>
