@@ -3,94 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Streaming Planet - Panel Pro 2026</title>
+    <title>Streaming Planet | Flujo TV Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .loading { animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
-        .status-red { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
-        .status-yellow { background: rgba(234, 179, 8, 0.2); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.4); }
-        .status-green { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.4); }
-        .btn-ws { transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
-        .btn-ws:active { transform: scale(0.95); }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #020617; }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .bg-netflix { background: #E50914; }
+        .bg-disney { background: #006E99; }
+        .bg-max { background: #0047FF; }
+        .bg-prime { background: #00A8E1; }
+        .bg-spotify { background: #1DB954; }
+        .bg-youtube { background: #FF0000; }
+        .bg-flujotv { background: #6366F1; } /* Color para Flujo TV */
+        .bg-iptv { background: #F59E0B; }
+        .bg-canva { background: #7D2AE8; }
+        .bg-paramount { background: #0064FF; }
+        .bg-egreso { background: #ef4444; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 p-4 font-sans text-[11px]">
-    <div class="max-w-7xl mx-auto">
+<body class="text-slate-100 p-4 md:p-6">
+    <div class="max-w-[1600px] mx-auto">
         
-        <header class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 font-black">
-            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 text-center shadow-lg">
-                <p class="text-[9px] text-blue-400 uppercase mb-1 font-bold">Ganancia Hoy</p>
-                <p id="gananciaDia" class="text-xl font-black text-white">$0.00</p>
+        <header class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+            <div class="glass p-4 rounded-3xl border-l-4 border-blue-500">
+                <p class="text-[9px] text-blue-400 font-bold uppercase tracking-widest">Ingreso Ventas (Hoy)</p>
+                <p id="ventasBrutas" class="text-xl font-extrabold mt-1 text-white">$0.00</p>
             </div>
-            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 text-center shadow-lg">
-                <p class="text-[9px] text-purple-400 uppercase mb-1 font-bold">Semana</p>
-                <p id="gananciaSemana" class="text-xl font-black text-white">$0.00</p>
+            
+            <div class="glass p-4 rounded-3xl border-l-4 border-red-500 bg-red-500/5">
+                <div class="flex justify-between items-center">
+                    <p class="text-[9px] text-red-400 font-bold uppercase tracking-widest">Costo Total (Hoy)</p>
+                    <button onclick="registrarEgresoRapido()" class="bg-red-500 text-[10px] px-2 py-0.5 rounded-lg hover:bg-red-400 transition-all">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <p id="egresosHoy" class="text-xl font-extrabold mt-1 text-white">$0.00</p>
             </div>
-            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 text-center shadow-lg">
-                <p class="text-[9px] text-green-400 uppercase mb-1 font-bold">Mes</p>
-                <p id="gananciaMes" class="text-xl font-black text-white">$0.00</p>
+
+            <div class="glass p-4 rounded-3xl border-l-4 border-emerald-500 bg-emerald-500/5">
+                <p class="text-[9px] text-emerald-400 font-bold uppercase tracking-widest">Utilidad Neta (Hoy)</p>
+                <p id="cajaNeto" class="text-xl font-extrabold mt-1 text-emerald-400">$0.00</p>
             </div>
-            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 text-center shadow-lg">
-                <p class="text-[9px] text-yellow-500 uppercase mb-1 font-bold">Año 2026</p>
-                <p id="gananciaAnio" class="text-xl font-black text-white">$0.00</p>
+
+            <div class="glass p-4 rounded-3xl border-l-4 border-purple-500">
+                <p class="text-[9px] text-purple-400 font-bold uppercase tracking-widest">Utilidad Mes</p>
+                <p id="gananciaMes" class="text-xl font-extrabold mt-1">$0.00</p>
+            </div>
+
+            <div class="glass p-4 rounded-3xl border-l-4 border-yellow-500">
+                <p class="text-[9px] text-yellow-500 font-bold uppercase tracking-widest">Balance Anual</p>
+                <p id="gananciaAnio" class="text-xl font-extrabold mt-1 text-yellow-500 font-black">$0.00</p>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div class="lg:col-span-1 bg-slate-900 p-5 rounded-2xl border border-slate-800 h-fit sticky top-4 shadow-2xl">
-                <h2 class="text-blue-400 font-bold mb-4 uppercase tracking-widest flex justify-between items-center text-[10px]">
-                    <span>Registro Cliente</span>
-                    <label class="text-[9px] text-slate-500 flex items-center gap-1 cursor-pointer font-bold">
-                        <input type="checkbox" id="mantenerDatos"> COMBO
-                    </label>
-                </h2>
-                <div class="space-y-3">
-                    <input id="nombre" type="text" placeholder="NOMBRE CLIENTE" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold uppercase outline-none focus:border-blue-500">
-                    <input id="telefono" type="text" placeholder="WHATSAPP (58412...)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 outline-none focus:border-blue-500">
-                    <select id="servicio" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold outline-none uppercase">
-                        <option>NETFLIX</option><option>DISNEY+</option><option>MAX</option>
-                        <option>PRIME VIDEO</option><option>PARAMOUNT+</option><option>IPTV</option>
-                        <option>MAGIS TV</option><option>YOUTUBE</option><option>SPOTIFY</option><option>CANVA PRO</option>
-                    </select>
-                    <div class="grid grid-cols-2 gap-2">
-                        <input id="costo" type="number" step="0.01" placeholder="Costo $" class="bg-slate-800 border border-slate-700 rounded-lg p-2.5 outline-none">
-                        <input id="precio" type="number" step="0.01" placeholder="Venta $" class="bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold text-green-400 outline-none">
-                    </div>
-                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-2 text-[10px]">
-                        <input id="correo" type="text" placeholder="Correo / Usuario" class="w-full bg-transparent border-b border-slate-800 p-1 outline-none">
-                        <input id="clave" type="text" placeholder="Contraseña" class="w-full bg-transparent border-b border-slate-800 p-1 outline-none">
-                        <div class="grid grid-cols-2 gap-2 mt-2">
-                            <input id="perfil" type="text" placeholder="Perfil" class="bg-slate-800 p-1 rounded">
-                            <input id="pin" type="text" placeholder="PIN" class="bg-slate-800 p-1 rounded">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-3">
+                <div class="glass p-6 rounded-3xl shadow-2xl">
+                    <h2 class="text-xs font-black text-blue-400 uppercase tracking-widest mb-4 italic">Planet Register</h2>
+                    <div class="space-y-3">
+                        <input id="nombre" type="text" placeholder="CLIENTE" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs font-bold uppercase outline-none">
+                        <input id="telefono" type="text" placeholder="TELÉFONO" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs outline-none">
+                        <select id="servicio" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs font-bold uppercase outline-none">
+                            <option value="NETFLIX">Netflix</option>
+                            <option value="DISNEY+">Disney+</option>
+                            <option value="MAX">Max</option>
+                            <option value="PRIME VIDEO">Prime Video</option>
+                            <option value="IPTV">IPTV</option>
+                            <option value="FLUJO TV">Flujo TV</option> <option value="YOUTUBE">YouTube</option>
+                            <option value="SPOTIFY">Spotify</option>
+                            <option value="PARAMOUNT+">Paramount+</option>
+                            <option value="CANVA PRO">Canva Pro</option>
+                        </select>
+                        <div class="grid grid-cols-2 gap-2">
+                            <input id="costo" type="number" step="0.01" placeholder="Costo $" class="bg-slate-900 border border-red-900/30 rounded-xl p-3 text-xs outline-none text-red-400">
+                            <input id="precio" type="number" step="0.01" placeholder="Venta $" class="bg-slate-900 border border-emerald-900/30 rounded-xl p-3 text-xs font-bold text-emerald-400 outline-none">
                         </div>
+                        <input id="vencimiento" type="date" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs font-bold text-white">
+                        <button onclick="guardarEnGoogle()" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-500 font-black py-4 rounded-xl shadow-lg uppercase text-[10px] tracking-widest transition-all">Registrar Venta</button>
                     </div>
-                    <input id="vencimiento" type="date" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold text-white outline-none">
-                    <button onclick="guardarEnGoogle()" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-500 font-black py-3 rounded-xl shadow-lg uppercase transition-all">Guardar Registro</button>
                 </div>
             </div>
 
-            <div class="lg:col-span-3 bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
-                <div class="p-4 border-b border-slate-800">
-                    <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="🔍 Buscar cliente o servicio..." class="w-full max-w-md bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 outline-none focus:border-blue-500">
-                </div>
-                <div class="overflow-x-auto max-h-[700px]">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-950 text-slate-500 uppercase text-[9px] tracking-widest sticky top-0 z-10">
-                            <tr>
-                                <th class="p-4 border-b">Cliente / Servicio</th>
-                                <th class="p-4 text-center border-b">Estado</th>
-                                <th class="p-4 border-b">Vencimiento</th>
-                                <th class="p-4 text-center border-b">Acciones</th>
-                                <th class="p-4 text-center border-b"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="cuerpoTabla" class="divide-y divide-slate-800">
-                            <tr><td colspan="5" class="p-20 text-center loading text-slate-600 font-bold italic uppercase">Conectando...</td></tr>
-                        </tbody>
-                    </table>
+            <div class="lg:col-span-9">
+                <div class="glass rounded-3xl overflow-hidden">
+                    <div class="p-4 bg-white/5">
+                        <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="🔍 Buscar hoy (Cliente o Servicio)..." class="w-full max-w-sm bg-slate-950 border border-slate-800 rounded-2xl px-4 py-2 text-xs outline-none focus:border-blue-500">
+                    </div>
+                    <div class="overflow-x-auto max-h-[600px]">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-950/50 text-slate-500 uppercase text-[9px] font-black tracking-widest sticky top-0">
+                                <tr>
+                                    <th class="p-5">Servicio / Cliente</th>
+                                    <th class="p-5">Costo Unit.</th>
+                                    <th class="p-5">Precio Venta</th>
+                                    <th class="p-5">Estado</th>
+                                    <th class="p-5 text-right">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cuerpoTabla" class="divide-y divide-white/5"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -100,132 +114,131 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbxRFID-dOQuNJcC2b74GmpYXJ9Do6w5U0yQy89IPy1Y805owu__Xce3yRI9eDBnVpjz/exec";
         let clientesGlobal = [];
 
+        const PLATAFORMAS = {
+            "NETFLIX": { icon: "fab fa-netflix", color: "bg-netflix" },
+            "DISNEY+": { icon: "fas fa-wand-sparkles", color: "bg-disney" },
+            "MAX": { icon: "fas fa-bolt", color: "bg-max" },
+            "PRIME VIDEO": { icon: "fab fa-amazon", color: "bg-prime" },
+            "SPOTIFY": { icon: "fab fa-spotify", color: "bg-spotify" },
+            "YOUTUBE": { icon: "fab fa-youtube", color: "bg-youtube" },
+            "FLUJO TV": { icon: "fas fa-play", color: "bg-flujotv" }, // Cambio aquí
+            "IPTV": { icon: "fas fa-satellite-dish", color: "bg-iptv" },
+            "CANVA PRO": { icon: "fas fa-palette", color: "bg-canva" },
+            "PARAMOUNT+": { icon: "fas fa-mountain", color: "bg-paramount" },
+            "EGRESO": { icon: "fas fa-minus-circle", color: "bg-egreso" }
+        };
+
         async function cargarDatos() {
             try {
                 const res = await fetch(API_URL);
                 clientesGlobal = await res.json();
                 renderizarTabla();
-            } catch(e) { console.error("Error cargando datos:", e); }
-        }
-
-        function procesarFecha(valor) {
-            if (!valor) return new Date(0);
-            if (!isNaN(valor) && typeof valor !== 'string') return new Date((valor - 25569) * 86400 * 1000);
-            if (valor.toString().includes('T')) return new Date(valor);
-            let partes = valor.toString().split(/[-/]/);
-            if (partes.length === 3) {
-                if (partes[0].length === 4) return new Date(partes[0], partes[1] - 1, partes[2]);
-                return new Date(partes[2], partes[1] - 1, partes[0]);
-            }
-            return new Date(valor);
+            } catch(e) { console.error("Error cargando datos", e); }
         }
 
         function renderizarTabla() {
             const tabla = document.getElementById('cuerpoTabla');
             const busqueda = document.getElementById('buscador').value.toLowerCase();
             const hoy = new Date(); hoy.setHours(0,0,0,0);
-            const hace7d = new Date(); hace7d.setDate(hoy.getDate() - 7);
             
-            let gDia = 0, gSemana = 0, gMes = 0, gAnio = 0;
+            let sumaVentaHoy = 0, sumaCostoHoy = 0, utilMes = 0, utilAnio = 0;
+
             let filtrados = clientesGlobal.filter(c => c[1].toString().toLowerCase().includes(busqueda) || c[3].toString().toLowerCase().includes(busqueda));
 
             let html = "";
             filtrados.forEach(c => {
-                const fechaV = procesarFecha(c[10]);
-                const diff = fechaV.getTime() - hoy.getTime();
-                const dias = Math.ceil(diff / (1000 * 60 * 60 * 24));
-                const gan = (parseFloat(c[5]) - parseFloat(c[4])) || 0;
                 const fReg = new Date(parseInt(c[0]));
-                
+                const esEgreso = (c[1].toString().toUpperCase() === "EGRESO");
+                const costoVal = parseFloat(c[4]) || 0;
+                const ventaVal = parseFloat(c[5]) || 0;
+
                 if(!isNaN(fReg.getTime())) {
-                    if(fReg.toDateString() === hoy.toDateString()) gDia += gan;
-                    if(fReg >= hace7d) gSemana += gan;
-                    if(fReg.getMonth() === hoy.getMonth() && fReg.getFullYear() === 2026) gMes += gan;
-                    if(fReg.getFullYear() === 2026) gAnio += gan;
+                    const esHoy = (fReg.toDateString() === hoy.toDateString());
+                    const esMes = (fReg.getMonth() === hoy.getMonth() && fReg.getFullYear() === 2026);
+
+                    if(esEgreso) {
+                        if(esHoy) sumaCostoHoy += ventaVal;
+                        if(esMes) utilMes -= ventaVal;
+                        utilAnio -= ventaVal;
+                    } else {
+                        if(esHoy) {
+                            sumaVentaHoy += ventaVal;
+                            sumaCostoHoy += costoVal;
+                        }
+                        if(esMes) utilMes += (ventaVal - costoVal);
+                        utilAnio += (ventaVal - costoVal);
+                    }
                 }
 
-                let clse = dias <= 0 ? "status-red font-black" : (dias <= 3 ? "status-yellow font-bold" : "status-green font-bold");
-                let fechaTxt = isNaN(fechaV.getTime()) ? "ERROR" : fechaV.toISOString().split('T')[0];
-
-                // Generar los mensajes dinámicos
-                const msgAcceso = generarMensajeAcceso(c, fechaTxt);
-                const msgCobro = generarMensajeCobro(c, fechaTxt);
-                const tel = c[2].replace(/\+/g, '').replace(/\s/g, '');
-
-                html += `
-                    <tr class="hover:bg-slate-800/40 transition-colors border-b border-slate-800/50 text-[10px]">
-                        <td class="p-4">
-                            <div class="font-bold uppercase text-blue-400">${c[1]}</div>
-                            <div class="text-slate-500 text-[8px] font-black">${c[3]}</div>
-                        </td>
-                        <td class="p-4 text-center">
-                            <span class="px-2 py-0.5 rounded-full border text-[8px] uppercase ${clse}">
-                                ${dias <= 0 ? 'VENCIDO' : dias + ' DÍAS'}
-                            </span>
-                        </td>
-                        <td class="p-4 text-slate-500 font-mono font-bold">${fechaTxt}</td>
-                        <td class="p-4 text-center flex justify-center gap-1">
-                            <a href="https://api.whatsapp.com/send?phone=${tel}&text=${msgAcceso}" target="_blank" class="bg-blue-600 px-3 py-1.5 rounded text-[8px] font-black uppercase btn-ws text-white">Entrega</a>
-                            <button onclick="renovar('${c[0]}')" class="bg-indigo-600 px-3 py-1.5 rounded text-[8px] font-black uppercase btn-ws text-white">Renovar</button>
-                            <a href="https://api.whatsapp.com/send?phone=${tel}&text=${msgCobro}" target="_blank" class="bg-green-600 px-3 py-1.5 rounded text-[8px] font-black uppercase btn-ws text-white">Cobro</a>
-                        </td>
-                        <td class="p-4 text-center">
-                            <button onclick="eliminar('${c[0]}')" class="text-slate-800 hover:text-red-500 transition-colors">🗑️</button>
-                        </td>
-                    </tr>`;
+                const plat = PLATAFORMAS[c[3].toUpperCase()] || { icon: "fas fa-tv", color: "bg-slate-700" };
+                
+                if(esEgreso) {
+                    html += `
+                        <tr class="bg-red-500/5 text-[11px]">
+                            <td class="p-5 font-black text-red-400"><i class="fas fa-minus-circle mr-2"></i> GASTO: ${c[3]}</td>
+                            <td class="p-5">--</td>
+                            <td class="p-5 text-red-400">-$${ventaVal.toFixed(2)}</td>
+                            <td class="p-5 uppercase text-[9px] font-bold">EGRESO CAJA</td>
+                            <td class="p-5 text-right"><button onclick="eliminar('${c[0]}')" class="text-slate-700 hover:text-red-500 transition-colors"><i class="fas fa-trash"></i></button></td>
+                        </tr>`;
+                } else {
+                    html += `
+                        <tr class="hover:bg-white/5 text-[11px]">
+                            <td class="p-5">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-lg ${plat.color} flex items-center justify-center text-white shadow-lg"><i class="${plat.icon} text-xs"></i></div>
+                                    <div><p class="font-bold text-blue-400 uppercase tracking-tight">${c[1]}</p><p class="text-[9px] text-slate-500 font-bold">${c[3]}</p></div>
+                                </div>
+                            </td>
+                            <td class="p-5 text-red-400/70 font-mono italic">$${costoVal.toFixed(2)}</td>
+                            <td class="p-5 text-emerald-400 font-black">$${ventaVal.toFixed(2)}</td>
+                            <td class="p-5"><span class="text-[8px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-bold">SINCRO OK</span></td>
+                            <td class="p-5 text-right"><button onclick="eliminar('${c[0]}')" class="text-slate-800 hover:text-red-500 transition-colors"><i class="fas fa-trash-alt"></i></button></td>
+                        </tr>`;
+                }
             });
 
-            tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center">Sin resultados</td></tr>';
-            document.getElementById('gananciaDia').innerText = `$${gDia.toFixed(2)}`;
-            document.getElementById('gananciaSemana').innerText = `$${gSemana.toFixed(2)}`;
-            document.getElementById('gananciaMes').innerText = `$${gMes.toFixed(2)}`;
-            document.getElementById('gananciaAnio').innerText = `$${gAnio.toFixed(2)}`;
+            tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center text-slate-600 uppercase font-black">No hay registros hoy</td></tr>';
+            
+            // ASIGNACIÓN AL DASHBOARD
+            document.getElementById('ventasBrutas').innerText = `$${sumaVentaHoy.toFixed(2)}`;
+            document.getElementById('egresosHoy').innerText = `$${sumaCostoHoy.toFixed(2)}`;
+            document.getElementById('cajaNeto').innerText = `$${(sumaVentaHoy - sumaCostoHoy).toFixed(2)}`;
+            document.getElementById('gananciaMes').innerText = `$${utilMes.toFixed(2)}`;
+            document.getElementById('gananciaAnio').innerText = `$${utilAnio.toFixed(2)}`;
         }
 
-        function generarMensajeAcceso(c, fecha) {
-            return encodeURIComponent(`*PLANET STREAMING*\n\n⭐ *SERVICIOS ACTIVOS - ${c[1]}* ⭐\n------------------------------\n📺 *SERVICIO:* ${c[3]}\n👤 *Usuario:* ${c[6]}\n🔑 *Clave:* ${c[7]}\n👤 *Perfil:* ${c[8]}\n📌 *PIN:* ${c[9]}\n🗓️ *Vence:* ${fecha}\n------------------------------\n\n⚠️ *REGLAS IMPORTANTES:*\n- No cambiar datos de la cuenta.\n- Usar solo el perfil asignado.\n\nGracias por tu compra en *Planet Streaming* 🍿`);
-        }
-
-        function generarMensajeCobro(c, fecha) {
-            return encodeURIComponent(`Hola *${c[1]}*, te saludamos de *Planet Streaming*. Tu servicio de *${c[3]}* vence pronto (${fecha}). ¿Deseas renovar para no perder tu perfil? 🚀`);
+        async function registrarEgresoRapido() {
+            const m = prompt("Monto del gasto ($):");
+            const mo = prompt("Motivo (Concepto):");
+            if(!m || isNaN(m) || !mo) return;
+            const data = { id: Date.now(), nombre: "EGRESO", telefono: "0", servicio: mo.toUpperCase(), costo: 0, precio: parseFloat(m), vencimiento: new Date().toISOString().split('T')[0] };
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+            location.reload();
         }
 
         async function guardarEnGoogle() {
             const btn = document.getElementById('btnGuardar');
-            const data = {
-                id: Date.now(),
-                nombre: document.getElementById('nombre').value.toUpperCase().trim(),
-                telefono: document.getElementById('telefono').value.trim(),
-                servicio: document.getElementById('servicio').value,
-                costo: document.getElementById('costo').value || 0,
-                precio: document.getElementById('precio').value || 0,
-                correo: document.getElementById('correo').value.trim(),
-                clave: document.getElementById('clave').value.trim(),
-                perfil: document.getElementById('perfil').value.trim(),
-                pin: document.getElementById('pin').value.trim(),
-                vencimiento: document.getElementById('vencimiento').value
+            const data = { 
+                id: Date.now(), 
+                nombre: document.getElementById('nombre').value.toUpperCase().trim(), 
+                telefono: document.getElementById('telefono').value.trim(), 
+                servicio: document.getElementById('servicio').value, 
+                costo: parseFloat(document.getElementById('costo').value) || 0, 
+                precio: parseFloat(document.getElementById('precio').value) || 0, 
+                vencimiento: document.getElementById('vencimiento').value 
             };
-            if(!data.nombre || !data.vencimiento) return alert("⚠️ Nombre y Fecha obligatorios");
-            btn.disabled = true; btn.innerText = "REGISTRANDO...";
+            if(!data.nombre || !data.vencimiento) return alert("Nombre y Fecha son obligatorios");
+            btn.innerText = "REGISTRANDO..."; btn.disabled = true;
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-            
-            if(document.getElementById('mantenerDatos').checked) {
-                document.getElementById('costo').value = ""; document.getElementById('precio').value = "";
-                document.getElementById('perfil').value = ""; document.getElementById('pin').value = "";
-                btn.disabled = false; btn.innerText = "SIGUIENTE"; cargarDatos();
-            } else { location.reload(); }
-        }
-
-        async function renovar(id) {
-            if(!confirm("¿Deseas renovar este servicio?")) return;
-            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'RENEW', id: id }) });
             location.reload();
         }
 
-        async function eliminar(id) {
-            if(!confirm("¿Eliminar permanentemente?")) return;
-            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', id: id }) });
-            location.reload();
+        async function eliminar(id) { 
+            if(confirm("¿Estás seguro de eliminar este registro?")) { 
+                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', id: id }) }); 
+                location.reload(); 
+            } 
         }
 
         window.onload = cargarDatos;
