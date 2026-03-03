@@ -85,7 +85,7 @@
                             </tr>
                         </thead>
                         <tbody id="cuerpoTabla" class="divide-y divide-slate-800 text-white font-bold uppercase">
-                            <tr><td colspan="5" class="p-20 text-center loading uppercase font-black">Conectando...</td></tr>
+                            <tr><td colspan="5" class="p-20 text-center loading uppercase font-black">Cargando...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -96,20 +96,6 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxRFID-dOQuNJcC2b74GmpYXJ9Do6w5U0yQy89IPy1Y805owu__Xce3yRI9eDBnVpjz/exec";
         let clientesGlobal = [];
-
-        // CONVERSOR DE EMOJIS A CARACTERES DE SISTEMA (Inmune a rombos)
-        const getEmoji = (code) => String.fromCodePoint(code);
-        
-        const ICON = {
-            KEY: getEmoji(128273),    // 🔑
-            TV: getEmoji(128250),     // 📺
-            USER: getEmoji(128100),   // 👤
-            POP: getEmoji(127871),    // 🍿
-            PIN: getEmoji(128204),    // 📌
-            ALERT: getEmoji(128680),  // 🚨
-            CAL: getEmoji(128197),    // 🗓️
-            MAIL: getEmoji(9993)      // ✉️
-        };
 
         async function cargarDatos() {
             try {
@@ -162,7 +148,7 @@
                 let fechaTxt = isNaN(fechaV.getTime()) ? "ERROR" : fechaV.toISOString().split('T')[0];
 
                 html += `
-                    <tr class="hover:bg-slate-800/40 border-b border-slate-800/50 transition-colors text-[10px]">
+                    <tr class="hover:bg-slate-800/40 border-b border-slate-800/50 transition-colors">
                         <td class="p-4 text-blue-400 font-bold uppercase">${c[1]}<br><span class="text-slate-500 font-black">${c[3]}</span></td>
                         <td class="p-4 text-center">
                             <span class="px-2 py-1 rounded-full border font-black ${clse}">
@@ -203,19 +189,19 @@
                 pin: document.getElementById('pin').value.trim(),
                 vencimiento: document.getElementById('vencimiento').value
             };
-            btn.innerText = "PROCESANDO...";
+            btn.innerText = "ESPERE...";
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
             location.reload();
         }
 
         async function renovar(id) {
-            if(!confirm("¿Renovar 30 días?")) return;
+            if(!confirm("¿Renovar?")) return;
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'RENEW', id: id }) });
             location.reload();
         }
 
         async function eliminar(id) {
-            if(!confirm("¿Borrar definitivamente?")) return;
+            if(!confirm("¿Eliminar?")) return;
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', id: id }) });
             location.reload();
         }
@@ -224,21 +210,22 @@
             const c = clientesGlobal.find(x => x[0] == id);
             const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
             
-            // CONSTRUCCIÓN DINÁMICA DE MENSAJE (Evita errores de lectura en el archivo)
-            let msj = ICON.PIN + " *SERVICIOS ACTIVOS - " + c[1] + "* " + ICON.PIN + "\n" +
-                      "Gracias por tu compra en *Streaming Planet*\n\n" +
-                      "------------------------------\n" +
-                      ICON.TV + " *SERVICIO:* " + c[3] + "\n" +
-                      ICON.MAIL + " *Usuario:* " + c[6] + "\n" +
-                      ICON.KEY + " *Clave:* " + c[7] + "\n" +
-                      ICON.USER + " *Perfil:* " + c[8] + "\n" +
-                      ICON.PIN + " *PIN:* " + c[9] + "\n" +
-                      ICON.CAL + " *Vence:* " + fechaV + "\n" +
-                      "------------------------------\n\n" +
-                      ICON.ALERT + " *REGLAS IMPORTANTES:*\n" +
-                      "- No cambiar datos de la cuenta.\n" +
-                      "- Usar solo el perfil asignado.\n" +
-                      "- Disfruta tu programación " + ICON.POP;
+            // FORMATO SOLICITADO CON TRATAMIENTO ANTI-ROMBOS
+            const l1 = "\uD83D\uDE80 *SERVICIOS ACTIVOS - " + c[1] + "* \u2B50";
+            const l2 = "Gracias por tu compra en Streaming Planet";
+            const sep = "------------------------------";
+            const l3 = "\uD83D\uDCFA *SERVICIO:* " + c[3];
+            const l4 = "\u2709\uFE0F *Usuario:* " + c[6];
+            const l5 = "\uD83D\uDD11 *Clave:* " + c[7];
+            const l6 = "\uD83D\uDC64 *Perfil:* " + c[8];
+            const l7 = "\uD83D\uDD10 *PIN:* " + c[9];
+            const l8 = "\uD83D\uDDD3 *Vence:* " + fechaV;
+            const l9 = "\uD83D\uDEA8 *REGLAS IMPORTANTES:*";
+            const r1 = "* No cambiar datos de la cuenta.";
+            const r2 = "* Usar solo el perfil asignado.";
+            const r3 = "* Disfruta tu programación \uD83C\uDF7F";
+
+            const msj = l1 + "\n" + l2 + "\n\n" + sep + "\n" + l3 + "\n" + l4 + "\n" + l5 + "\n" + l6 + "\n" + l7 + "\n" + l8 + "\n" + sep + "\n\n" + l9 + "\n" + r1 + "\n" + r2 + "\n" + r3;
             
             abrirWS(c[2], msj);
         }
@@ -246,16 +233,15 @@
         function wsCobro(id) {
             const c = clientesGlobal.find(x => x[0] == id);
             const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
-            let msj = "Hola *" + c[1] + "*, te saludamos de *Streaming Planet*. Tu servicio de *" + c[3] + "* vence el (" + fechaV + "). " + ICON.CAL + " ¿Deseas renovar?";
+            const msj = "Hola *" + c[1] + "*, te saludamos de *Streaming Planet*. Tu servicio de *" + c[3] + "* vence el (" + fechaV + "). \uD83D\uDDD3 ¿Deseas renovar?";
             abrirWS(c[2], msj);
         }
 
         function abrirWS(tel, msj) {
             const fTel = tel.toString().replace(/\D/g, '');
             const msjFinal = encodeURIComponent(msj);
-            // Uso de API oficial directa para PC
-            const urlWeb = "https://api.whatsapp.com/send?phone=" + fTel + "&text=" + msjFinal;
-            window.open(urlWeb, '_blank');
+            // Link de API para forzar el comportamiento correcto en PC
+            window.open("https://api.whatsapp.com/send?phone=" + fTel + "&text=" + msjFinal, "_blank");
         }
 
         window.onload = cargarDatos;
