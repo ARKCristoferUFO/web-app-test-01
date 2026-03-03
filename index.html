@@ -14,7 +14,7 @@
         .btn-ws { transition: transform 0.1s active; }
         .btn-ws:active { transform: scale(0.95); }
         .tabla-contenedor { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { min-width: 850px; }
+        table { min-width: 800px; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 p-4 font-sans text-xs">
@@ -25,26 +25,26 @@
                 <p class="text-[9px] text-blue-400 uppercase mb-1">Ventas Hoy</p>
                 <p id="gananciaDia" class="text-xl">$0.00</p>
             </div>
-            <div class="bg-slate-900 p-4 rounded-2xl border border-red-900/40 text-center shadow-lg">
+            <div class="bg-slate-900 p-4 rounded-2xl border border-red-900/30 text-center shadow-lg">
                 <p class="text-[9px] text-red-400 uppercase mb-1">Inversión Hoy</p>
                 <p id="costoDia" class="text-xl text-red-400">$0.00</p>
             </div>
-            <div class="bg-slate-900 p-4 rounded-2xl border border-emerald-500/40 text-center shadow-lg">
+            <div class="bg-slate-900 p-4 rounded-2xl border border-emerald-500/30 text-center shadow-lg">
                 <p class="text-[9px] text-emerald-400 uppercase mb-1">Caja Neta Hoy</p>
                 <p id="netoDia" class="text-xl text-emerald-400">$0.00</p>
             </div>
-            <div class="bg-slate-900 p-4 rounded-2xl border border-purple-900/40 text-center shadow-lg">
+            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 text-center shadow-lg">
                 <p class="text-[9px] text-purple-400 uppercase mb-1">Utilidad Mes</p>
                 <p id="gananciaMes" class="text-xl">$0.00</p>
             </div>
             <div class="bg-slate-900 p-4 rounded-2xl border border-yellow-500 text-center shadow-lg">
                 <p class="text-[9px] text-yellow-500 uppercase mb-1">Balance 2026</p>
-                <p id="gananciaAnio" class="text-xl text-yellow-500">$0.00</p>
+                <p id="gananciaAnio" class="text-xl">$0.00</p>
             </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div class="lg:col-span-1 bg-slate-900 p-5 rounded-2xl border border-slate-800 h-fit shadow-xl">
+            <div class="lg:col-span-1 bg-slate-900 p-5 rounded-2xl border border-slate-800 h-fit">
                 <h2 class="text-blue-400 font-bold mb-4 uppercase tracking-widest flex justify-between">
                     <span>Nuevo Registro</span>
                     <label class="text-[9px] text-slate-500 flex items-center gap-1 cursor-pointer">
@@ -52,18 +52,18 @@
                     </label>
                 </h2>
                 <div class="space-y-3">
-                    <input id="nombre" type="text" placeholder="NOMBRE CLIENTE" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold uppercase outline-none focus:border-blue-500 text-white">
-                    <input id="telefono" type="text" placeholder="WHATSAPP (58412...)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 outline-none focus:border-blue-500 text-white">
-                    <select id="servicio" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold outline-none text-white">
+                    <input id="nombre" type="text" placeholder="NOMBRE CLIENTE" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold uppercase outline-none focus:border-blue-500">
+                    <input id="telefono" type="text" placeholder="WHATSAPP (58412...)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 outline-none focus:border-blue-500">
+                    <select id="servicio" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold outline-none">
                         <option>NETFLIX</option><option>DISNEY+</option><option>MAX</option>
                         <option>PRIME VIDEO</option><option>PARAMOUNT+</option><option>IPTV</option>
                         <option>MAGIS TV</option><option>YOUTUBE</option><option>SPOTIFY</option><option>CANVA PRO</option>
                     </select>
                     <div class="grid grid-cols-2 gap-2">
-                        <input id="costo" type="number" step="0.01" placeholder="Costo $" class="bg-slate-800 border border-slate-700 rounded-lg p-2.5 outline-none focus:border-red-500 text-white">
+                        <input id="costo" type="number" step="0.01" placeholder="Costo $" class="bg-slate-800 border border-slate-700 rounded-lg p-2.5 outline-none focus:border-red-500">
                         <input id="precio" type="number" step="0.01" placeholder="Venta $" class="bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold text-green-400 outline-none focus:border-green-500">
                     </div>
-                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-2 text-white">
+                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-2">
                         <input id="correo" type="text" placeholder="Correo / Usuario" class="w-full bg-transparent border-b border-slate-800 p-1 outline-none">
                         <input id="clave" type="text" placeholder="Contraseña" class="w-full bg-transparent border-b border-slate-800 p-1 outline-none">
                         <div class="grid grid-cols-2 gap-2 mt-2">
@@ -78,7 +78,7 @@
 
             <div class="lg:col-span-3 bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-slate-800">
-                    <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="&#128269; Buscar cliente o servicio..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 outline-none focus:border-blue-500 text-white">
+                    <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="🔍 Buscar cliente o servicio..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 outline-none focus:border-blue-500">
                 </div>
                 <div class="tabla-contenedor max-h-[600px]">
                     <table class="w-full text-left">
@@ -91,7 +91,7 @@
                                 <th class="p-4"></th>
                             </tr>
                         </thead>
-                        <tbody id="cuerpoTabla" class="divide-y divide-slate-800 text-white">
+                        <tbody id="cuerpoTabla" class="divide-y divide-slate-800">
                             <tr><td colspan="5" class="p-20 text-center loading text-slate-600 font-bold italic text-xs uppercase">Conectando...</td></tr>
                         </tbody>
                     </table>
@@ -173,12 +173,13 @@
                             <button onclick="renovar('${c[0]}')" class="bg-indigo-600 px-2 py-1.5 rounded text-[9px] font-black uppercase btn-ws shadow-md">Renovar</button>
                             <button onclick="wsCobro('${c[0]}')" class="bg-green-600 px-2 py-1.5 rounded text-[9px] font-black uppercase btn-ws shadow-md">Cobro</button>
                         </td>
-                        <td class="p-4 text-center"><button onclick="eliminar('${c[0]}')" class="text-slate-800 hover:text-red-500 transition-colors">&#128465;</button></td>
+                        <td class="p-4"><button onclick="eliminar('${c[0]}')" class="text-slate-800 hover:text-red-500 transition-colors">🗑️</button></td>
                     </tr>`;
             });
 
             tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center">No hay registros</td></tr>';
             
+            // Actualización de Dashboard
             document.getElementById('gananciaDia').innerText = `$${vDia.toFixed(2)}`;
             document.getElementById('costoDia').innerText = `$${cDia.toFixed(2)}`;
             document.getElementById('netoDia').innerText = `$${(vDia - cDia).toFixed(2)}`;
@@ -223,36 +224,22 @@
             location.reload();
         }
 
-        // --- FUNCIÓN DE WHATSAPP CON EMOJIS BLINDADOS ---
         function wsAcceso(id) {
             const c = clientesGlobal.find(x => x[0] == id);
             const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
-            
-            // Los emojis se envían como códigos codificados para que el navegador NO los rompa
-            const star = decodeURIComponent('%E2%AD%90'); // ⭐
-            const tv = decodeURIComponent('%F0%9F%93%BA'); // 📺
-            const user = decodeURIComponent('%F0%9F%91%A4'); // 👤
-            const key = decodeURIComponent('%F0%9F%94%91'); // 🔑
-            const pin = decodeURIComponent('%F0%9F%93%8C'); // 📌
-            const calendar = decodeURIComponent('%F0%9F%93%85'); // 🗓️
-            const warn = decodeURIComponent('%E2%9A%A0%EF%B8%8F'); // ⚠️
-            const popcorn = decodeURIComponent('%F0%9F%8D%BF'); // 🍿
-
-            const msj = `${star} *SERVICIOS ACTIVOS - ${c[1]}* ${star}%0A------------------------------%0A${tv} *SERVICIO:* ${c[3]}%0A${user} *Usuario:* ${c[6]}%0A${key} *Clave:* ${c[7]}%0A${user} *Perfil:* ${c[8]}%0A${pin} *PIN:* ${c[9]}%0A${calendar} *Vence:* ${fechaV}%0A------------------------------%0A%0A${warn} *REGLAS IMPORTANTES:*%0A- No cambiar datos de la cuenta.%0A- Usar solo el perfil asignado.%0A%0AGracias por tu compra en *Planet Streaming* ${popcorn}`;
-            
+            const msj = `⭐ SERVICIOS ACTIVOS - ${c[1]} ⭐%0AGracias por tu compra en Streaming planet steaming%0A%0A------------------------------%0A📺 SERVICIO: ${c[3]}%0A👤 Usuario: ${c[6]}%0A🔑 Clave: ${c[7]}%0A👤 Perfil: ${c[8]}%0A📌 PIN: ${c[9]}%0A🗓️ Vence: ${fechaV}%0A------------------------------%0A%0A⚠️ REGLAS IMPORTANTES:%0A- No cambiar datos de la cuenta.%0A- Usar solo el perfil asignado.%0A- Disfruta tu programación 🍿`;
             abrirWS(c[2], msj);
         }
 
         function wsCobro(id) {
             const c = clientesGlobal.find(x => x[0] == id);
             const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
-            const rocket = decodeURIComponent('%F0%9F%9A%80'); // 🚀
-            const msj = `Hola *${c[1]}*, te saludamos de *Planet Streaming*. Tu servicio de *${c[3]}* vence pronto (${fechaV}). ${rocket} ¿Deseas renovar para no perder tu perfil?`;
+            const msj = `Hola *${c[1]}*, te saludamos de *Streaming Planet*. Tu servicio de *${c[3]}* vence pronto (${fechaV}). ¿Deseas renovar para no perder tu perfil? 🚀`;
             abrirWS(c[2], msj);
         }
 
         function abrirWS(tel, msj) {
-            const fTel = tel.toString().replace('+', '').replace(/\D/g, '');
+            const fTel = tel.replace('+', '');
             const urlApp = `whatsapp://send?phone=${fTel}&text=${msj}`;
             const urlWeb = `https://wa.me/${fTel}?text=${msj}`;
             window.location.href = urlApp;
