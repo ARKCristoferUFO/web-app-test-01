@@ -48,9 +48,21 @@
                     <input id="nombre" type="text" placeholder="NOMBRE CLIENTE" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold uppercase text-white outline-none">
                     <input id="telefono" type="text" placeholder="WHATSAPP (Ej: 58...)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white outline-none">
                     <select id="servicio" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold text-white">
-                        <option>NETFLIX</option><option>DISNEY+</option><option>MAX</option>
-                        <option>PRIME VIDEO</option><option>PARAMOUNT+</option><option>IPTV</option>
-                        <option>MAGIS TV</option><option>YOUTUBE</option><option>SPOTIFY</option><option>CANVA PRO</option>
+                        <option>NETFLIX PERFIL</option>
+                        <option>NETFLIX PERSONAL</option>
+                        <option>DISNEY+</option>
+                        <option>MAX</option>
+                        <option>PRIME VIDEO</option>
+                        <option>PARAMOUNT+</option>
+                        <option>IPTV</option>
+                        <option>FLUJO TV</option>
+                        <option>TELELATINO</option>
+                        <option>YOUTUBE</option>
+                        <option>SPOTIFY</option>
+                        <option>CRUNCHYROLL</option>
+                        <option>VIKI RAKUTEN</option>
+                        <option>OLEADA TV</option>
+                        <option>CANVA PRO</option>
                     </select>
                     <div class="grid grid-cols-2 gap-2">
                         <input id="costo" type="number" step="0.01" placeholder="Costo $" class="bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white">
@@ -85,7 +97,7 @@
                             </tr>
                         </thead>
                         <tbody id="cuerpoTabla" class="divide-y divide-slate-800 text-white font-bold uppercase">
-                            <tr><td colspan="5" class="p-20 text-center loading uppercase font-black">Conectando...</td></tr>
+                            <tr><td colspan="5" class="p-20 text-center loading uppercase font-black">Sincronizando...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -96,6 +108,13 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxRFID-dOQuNJcC2b74GmpYXJ9Do6w5U0yQy89IPy1Y805owu__Xce3yRI9eDBnVpjz/exec";
         let clientesGlobal = [];
+
+        // FUNCIÓN PARA PONER FECHA +30 DÍAS AL ABRIR
+        function establecerFechaPredeterminada() {
+            const fechaFutura = new Date();
+            fechaFutura.setDate(fechaFutura.getDate() + 30);
+            document.getElementById('vencimiento').value = fechaFutura.toISOString().split('T')[0];
+        }
 
         async function cargarDatos() {
             try {
@@ -195,8 +214,28 @@
         }
 
         async function renovar(id) {
-            if(!confirm("¿Renovar?")) return;
-            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'RENEW', id: id }) });
+            const c = clientesGlobal.find(x => x[0] == id);
+            if(!c) return;
+
+            const hoy = new Date();
+            let fechaVencActual = procesarFecha(c[10]);
+            
+            // Lógica Acumulativa: si le quedan días, los suma a los 30.
+            let nuevaFecha;
+            if (fechaVencActual > hoy) {
+                nuevaFecha = new Date(fechaVencActual.getTime() + (30 * 24 * 60 * 60 * 1000));
+            } else {
+                nuevaFecha = new Date(hoy.getTime() + (30 * 24 * 60 * 60 * 1000));
+            }
+
+            const nuevaFechaStr = nuevaFecha.toISOString().split('T')[0];
+            if(!confirm("¿Sumar 30 días adicionales? Nueva fecha: " + nuevaFechaStr)) return;
+
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ 
+                action: 'UPDATE_FIELD', 
+                id: id, 
+                vencimiento: nuevaFechaStr 
+            }) });
             location.reload();
         }
 
@@ -236,17 +275,13 @@
             const dias = Math.ceil(diff / (1000 * 60 * 60 * 24));
             
             let msj = "";
-
             if (dias <= 0) {
-                // MENSAJE PARA 0 DIAS O VENCIDOS
                 msj = "\u00A1Hola, " + c[1] + "! \uD83D\uDC4B \u00BFCOmo est\u00E1s? Te escribimos para recordarte que tu plan de " + c[3] + " \uD83C\uDF7F termina hoy. \uD83D\uDE31\n\n" +
                       "Si quieres continuar viendo todo el contenido, solo tienes que contactarnos \uD83D\uDCF2 para reactivar tu cuenta.\n" +
                       "\u00A1Te esperamos! \u2728";
             } else {
-                // MENSAJE PARA 3 DIAS O MAS
                 msj = "Hola " + c[1] + ", a tu servicio de " + c[3] + " *le queda *" + dias + " d\u00EDas de servicio. Recuerda que puedes renovar por este medio.";
             }
-            
             abrirWS(c[2], msj);
         }
 
@@ -256,7 +291,10 @@
             window.open("https://api.whatsapp.com/send?phone=" + fTel + "&text=" + msjFinal, "_blank");
         }
 
-        window.onload = cargarDatos;
+        window.onload = function() {
+            cargarDatos();
+            establecerFechaPredeterminada();
+        };
     </script>
 </body>
 </html>
