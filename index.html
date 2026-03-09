@@ -85,7 +85,7 @@
                             </tr>
                         </thead>
                         <tbody id="cuerpoTabla" class="divide-y divide-slate-800 text-white font-bold uppercase">
-                            <tr><td colspan="5" class="p-20 text-center loading uppercase font-black">Cargando...</td></tr>
+                            <tr><td colspan="5" class="p-20 text-center loading uppercase font-black">Conectando...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -152,7 +152,7 @@
                         <td class="p-4 text-blue-400 font-bold uppercase">${c[1]}<br><span class="text-slate-500 font-black">${c[3]}</span></td>
                         <td class="p-4 text-center">
                             <span class="px-2 py-1 rounded-full border font-black ${clse}">
-                                ${dias <= 0 ? 'VENCIDO' : dias + ' DIAS'}
+                                ${dias <= 0 ? (dias === 0 ? 'VENCE HOY' : 'VENCIDO') : dias + ' DIAS'}
                             </span>
                         </td>
                         <td class="p-4 text-center text-slate-500 font-mono">${fechaTxt}</td>
@@ -165,7 +165,7 @@
                     </tr>`;
             });
 
-            tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center">Sin resultados</td></tr>';
+            tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center uppercase font-black">No hay registros</td></tr>';
             
             document.getElementById('gananciaDia').innerText = `$${vDia.toFixed(2)}`;
             document.getElementById('costoDia').innerText = `$${cDia.toFixed(2)}`;
@@ -210,37 +210,49 @@
             const c = clientesGlobal.find(x => x[0] == id);
             const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
             
-            // FORMATO SOLICITADO CON TRATAMIENTO ANTI-ROMBOS
-            const l1 = "\uD83D\uDE80 *SERVICIOS ACTIVOS - " + c[1] + "* \u2B50";
-            const l2 = "Gracias por tu compra en Streaming Planet";
-            const sep = "------------------------------";
-            const l3 = "\uD83D\uDCFA *SERVICIO:* " + c[3];
-            const l4 = "\u2709\uFE0F *Usuario:* " + c[6];
-            const l5 = "\uD83D\uDD11 *Clave:* " + c[7];
-            const l6 = "\uD83D\uDC64 *Perfil:* " + c[8];
-            const l7 = "\uD83D\uDD10 *PIN:* " + c[9];
-            const l8 = "\uD83D\uDDD3 *Vence:* " + fechaV;
-            const l9 = "\uD83D\uDEA8 *REGLAS IMPORTANTES:*";
-            const r1 = "* No cambiar datos de la cuenta.";
-            const r2 = "* Usar solo el perfil asignado.";
-            const r3 = "* Disfruta tu programación \uD83C\uDF7F";
-
-            const msj = l1 + "\n" + l2 + "\n\n" + sep + "\n" + l3 + "\n" + l4 + "\n" + l5 + "\n" + l6 + "\n" + l7 + "\n" + l8 + "\n" + sep + "\n\n" + l9 + "\n" + r1 + "\n" + r2 + "\n" + r3;
+            const msj = "\uD83D\uDE80 *SERVICIOS ACTIVOS - " + c[1] + "* \u2B50\n" +
+                        "Gracias por tu compra en Streaming Planet\n\n" +
+                        "------------------------------\n" +
+                        "\uD83D\uDCFA *SERVICIO:* " + c[3] + "\n" +
+                        "\u2709\uFE0F *Usuario:* " + c[6] + "\n" +
+                        "\uD83D\uDD11 *Clave:* " + c[7] + "\n" +
+                        "\uD83D\uDC64 *Perfil:* " + c[8] + "\n" +
+                        "\uD83D\uDD10 *PIN:* " + c[9] + "\n" +
+                        "\uD83D\uDDD3 *Vence:* " + fechaV + "\n" +
+                        "------------------------------\n\n" +
+                        "\uD83D\uDEA8 *REGLAS IMPORTANTES:*\n" +
+                        "* No cambiar datos de la cuenta.\n" +
+                        "* Usar solo el perfil asignado.\n" +
+                        "* Disfruta tu programación \uD83C\uDF7F";
             
             abrirWS(c[2], msj);
         }
 
         function wsCobro(id) {
             const c = clientesGlobal.find(x => x[0] == id);
-            const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
-            const msj = "Hola *" + c[1] + "*, te saludamos de *Streaming Planet*. Tu servicio de *" + c[3] + "* vence el (" + fechaV + "). \uD83D\uDDD3 ¿Deseas renovar?";
+            const hoy = new Date(); hoy.setHours(0,0,0,0);
+            const fechaV = procesarFecha(c[10]);
+            const diff = fechaV.getTime() - hoy.getTime();
+            const dias = Math.ceil(diff / (1000 * 60 * 60 * 24));
+            
+            let msj = "";
+
+            if (dias <= 0) {
+                // MENSAJE PARA 0 DIAS O VENCIDOS
+                msj = "\u00A1Hola, " + c[1] + "! \uD83D\uDC4B \u00BFCOmo est\u00E1s? Te escribimos para recordarte que tu plan de " + c[3] + " \uD83C\uDF7F termina hoy. \uD83D\uDE31\n\n" +
+                      "Si quieres continuar viendo todo el contenido, solo tienes que contactarnos \uD83D\uDCF2 para reactivar tu cuenta.\n" +
+                      "\u00A1Te esperamos! \u2728";
+            } else {
+                // MENSAJE PARA 3 DIAS O MAS
+                msj = "Hola " + c[1] + ", a tu servicio de " + c[3] + " *le queda *" + dias + " d\u00EDas de servicio. Recuerda que puedes renovar por este medio.";
+            }
+            
             abrirWS(c[2], msj);
         }
 
         function abrirWS(tel, msj) {
             const fTel = tel.toString().replace(/\D/g, '');
             const msjFinal = encodeURIComponent(msj);
-            // Link de API para forzar el comportamiento correcto en PC
             window.open("https://api.whatsapp.com/send?phone=" + fTel + "&text=" + msjFinal, "_blank");
         }
 
