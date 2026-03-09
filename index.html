@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Streaming Planet 2026 - Master Combo</title>
+    <title>Streaming Planet 2026 - Master Combo Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .loading { animation: pulse 2s infinite; }
@@ -12,9 +12,10 @@
         .status-yellow { background: rgba(234, 179, 8, 0.2); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.4); }
         .status-green { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.4); }
         .btn-plataforma { transition: all 0.2s; border: 1px solid #334155; cursor: pointer; }
-        .btn-plataforma.active { background: #2563eb; border-color: #60a5fa; color: white; font-weight: 900; }
+        .btn-plataforma.active { background: #2563eb; border-color: #60a5fa; color: white; font-weight: 900; box-shadow: 0 0 15px rgba(37, 99, 235, 0.4); }
         #contenedorDatosDinamicos::-webkit-scrollbar { width: 4px; }
         #contenedorDatosDinamicos::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 p-4 font-sans text-[11px]">
@@ -25,7 +26,7 @@
             <div class="bg-slate-900 p-4 rounded-2xl border border-red-900/40 shadow-lg text-red-400"><p class="text-[9px] uppercase">Costo Hoy</p><p id="costoDia" class="text-xl">$0.00</p></div>
             <div class="bg-slate-900 p-4 rounded-2xl border border-emerald-500/40 shadow-lg text-emerald-400"><p class="text-[9px] uppercase">Neto Hoy</p><p id="netoDia" class="text-xl">$0.00</p></div>
             <div class="bg-slate-900 p-4 rounded-2xl border border-purple-900/40 shadow-lg text-purple-400"><p class="text-[9px] uppercase">Utilidad Mes</p><p id="gananciaMes" class="text-xl">$0.00</p></div>
-            <div class="bg-slate-900 p-4 rounded-2xl border border-yellow-500 shadow-lg text-yellow-500"><p class="text-[9px] uppercase">Balance 2026</p><p id="gananciaAnio" class="text-xl">$0.00</p></div>
+            <div class="bg-slate-900 p-4 rounded-2xl border border-yellow-500 shadow-lg text-yellow-500"><p class="text-[9px] uppercase">Balance Anual</p><p id="gananciaAnio" class="text-xl">$0.00</p></div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -34,35 +35,35 @@
                     <input id="nombre" type="text" placeholder="NOMBRE CLIENTE" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 font-bold uppercase outline-none focus:border-blue-500 text-white">
                     <input id="telefono" type="text" placeholder="WHATSAPP (Ej: 58412...)" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3 outline-none text-white">
                     
-                    <p class="text-[9px] text-slate-500 font-black uppercase">1. Selecciona las plataformas del Combo:</p>
+                    <p class="text-[9px] text-slate-500 font-black uppercase">1. Seleccionar Servicios del Combo:</p>
                     <div id="gridPlataformas" class="grid grid-cols-2 gap-1.5 max-h-[140px] overflow-y-auto p-2 bg-slate-950 rounded-xl border border-slate-800"></div>
 
-                    <p class="text-[9px] text-slate-500 font-black uppercase mt-4">2. Rellena los datos de cada una:</p>
+                    <p class="text-[9px] text-slate-500 font-black uppercase mt-4">2. Datos de Acceso (Persistentes):</p>
                     <div id="contenedorDatosDinamicos" class="space-y-3 max-h-[350px] overflow-y-auto pr-1">
-                        <p class="text-slate-700 italic text-center py-10 border-2 border-dashed border-slate-800 rounded-xl">Selecciona plataformas arriba para empezar</p>
+                        <p class="text-slate-700 italic text-center py-10 border-2 border-dashed border-slate-800 rounded-xl uppercase">Selecciona plataformas para rellenar</p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2 pt-4 border-t border-slate-800">
-                        <input id="costo" type="number" step="0.01" placeholder="Costo Total $" class="bg-slate-800 border border-slate-700 rounded-xl p-2.5 outline-none text-white">
-                        <input id="precio" type="number" step="0.01" placeholder="Venta Total $" class="bg-slate-800 border border-slate-700 rounded-xl p-2.5 font-bold text-green-400 outline-none">
+                        <input id="costo" type="number" step="0.01" placeholder="Costo $" class="bg-slate-800 border border-slate-700 rounded-xl p-2.5 outline-none text-white">
+                        <input id="precio" type="number" step="0.01" placeholder="Venta $" class="bg-slate-800 border border-slate-700 rounded-xl p-2.5 font-bold text-green-400 outline-none">
                     </div>
 
                     <input id="vencimiento" type="date" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-2.5 font-bold outline-none text-white">
-                    <button onclick="guardarEnGoogle()" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-500 font-black py-4 rounded-2xl uppercase shadow-lg transition-all active:scale-95">Registrar Cliente</button>
+                    <button onclick="guardarEnGoogle()" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-500 font-black py-4 rounded-2xl uppercase shadow-lg transition-all active:scale-95">Registrar en Base de Datos</button>
                 </div>
             </div>
 
             <div class="lg:col-span-3 bg-slate-900 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden">
                 <div class="p-4 border-b border-slate-800 bg-slate-900/50">
-                    <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="Buscar cliente..." class="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-3 outline-none text-white">
+                    <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="Buscar cliente o plataforma..." class="w-full bg-slate-950 border border-slate-800 rounded-2xl px-5 py-3 outline-none text-white">
                 </div>
                 <div class="overflow-x-auto max-h-[800px]">
                     <table class="w-full text-left">
                         <thead class="bg-slate-950 text-slate-500 uppercase text-[9px] tracking-widest sticky top-0 z-10">
-                            <tr><th class="p-5">Cliente / Combo</th><th class="p-5 text-center">Estado</th><th class="p-5 text-center">Vence</th><th class="p-5 text-center">Acciones</th><th class="p-5 text-center">X</th></tr>
+                            <tr><th class="p-5">Cliente / Servicio</th><th class="p-5 text-center">Estado</th><th class="p-5 text-center">Vence</th><th class="p-5 text-center">Acciones</th><th class="p-5 text-center">X</th></tr>
                         </thead>
                         <tbody id="cuerpoTabla" class="divide-y divide-slate-800 text-white font-bold uppercase">
-                            <tr><td colspan="5" class="p-24 text-center loading text-slate-600">CARGANDO BASE DE DATOS...</td></tr>
+                            <tr><td colspan="5" class="p-24 text-center loading text-slate-600 font-black">ACTUALIZANDO REGISTROS...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -73,6 +74,8 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxRFID-dOQuNJcC2b74GmpYXJ9Do6w5U0yQy89IPy1Y805owu__Xce3yRI9eDBnVpjz/exec";
         let clientesGlobal = [];
+        let datosTemporales = {}; // Memoria para no perder lo escrito
+        
         const listaPlat = ["NETFLIX PERFIL", "NETFLIX PERSONAL", "DISNEY+", "MAX", "PRIME VIDEO", "PARAMOUNT+", "IPTV", "FLUJO TV", "TELELATINO", "VIX", "YOUTUBE", "SPOTIFY", "CRUNCHYROLL", "VIKI RAKUTEN", "OLEADA TV", "CANVA PRO"];
 
         function initGrid() {
@@ -87,40 +90,64 @@
         }
 
         function togglePlataforma(btn, nombre) {
-            btn.classList.toggle('active');
-            const contenedor = document.getElementById('contenedorDatosDinamicos');
-            const cleanId = "div-" + nombre.replace(/[^a-zA-Z0-9]/g, '');
+            // Guardar datos actuales antes de redibujar
+            const blocks = document.querySelectorAll('.data-block');
+            blocks.forEach(b => {
+                const id = b.dataset.plataforma;
+                datosTemporales[id] = {
+                    correo: b.querySelector('.val-correo').value,
+                    clave: b.querySelector('.val-clave').value,
+                    perfil: b.querySelector('.val-perfil').value,
+                    pin: b.querySelector('.val-pin').value
+                };
+            });
 
-            if (btn.classList.contains('active')) {
-                if (contenedor.querySelector('p')) contenedor.innerHTML = '';
+            btn.classList.toggle('active');
+            renderizarFormularios();
+        }
+
+        function renderizarFormularios() {
+            const contenedor = document.getElementById('contenedorDatosDinamicos');
+            const botonesActivos = document.querySelectorAll('.btn-plataforma.active');
+            
+            if (botonesActivos.length === 0) {
+                contenedor.innerHTML = '<p class="text-slate-700 italic text-center py-10 border-2 border-dashed border-slate-800 rounded-xl uppercase">Selecciona plataformas para rellenar</p>';
+                return;
+            }
+
+            contenedor.innerHTML = '';
+            botonesActivos.forEach(btn => {
+                const nombre = btn.innerText;
+                const d = datosTemporales[nombre] || { correo: '', clave: '', perfil: '', pin: '' };
+                
                 const div = document.createElement('div');
-                div.id = cleanId;
                 div.className = "bg-slate-950 p-4 rounded-2xl border border-blue-600/30 space-y-2 data-block";
                 div.dataset.plataforma = nombre;
                 div.innerHTML = `
-                    <p class="text-blue-500 font-black text-[9px] uppercase">${nombre}</p>
-                    <input type="text" placeholder="Usuario" class="val-correo w-full bg-transparent border-b border-slate-800 p-1 outline-none text-white">
-                    <input type="text" placeholder="Clave" class="val-clave w-full bg-transparent border-b border-slate-800 p-1 outline-none text-white">
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="text" placeholder="Perfil" class="val-perfil bg-slate-900 p-1.5 rounded-lg text-[9px] text-white">
-                        <input type="text" placeholder="PIN" class="val-pin bg-slate-900 p-1.5 rounded-lg text-[9px] text-white">
+                    <div class="flex justify-between items-center mb-1">
+                        <p class="text-blue-500 font-black text-[9px] uppercase">${nombre}</p>
+                        <span class="text-[8px] text-slate-600">DATOS ACTIVOS</span>
+                    </div>
+                    <input type="text" placeholder="Correo / Usuario" class="val-correo w-full bg-transparent border-b border-slate-800 p-1 outline-none text-white focus:border-blue-500 transition-colors" value="${d.correo}">
+                    <input type="text" placeholder="Contraseña" class="val-clave w-full bg-transparent border-b border-slate-800 p-1 outline-none text-white focus:border-blue-500 transition-colors" value="${d.clave}">
+                    <div class="grid grid-cols-2 gap-2 mt-1">
+                        <input type="text" placeholder="Perfil" class="val-perfil bg-slate-900 p-1.5 rounded-lg text-[9px] text-white border border-slate-800" value="${d.perfil}">
+                        <input type="text" placeholder="PIN" class="val-pin bg-slate-900 p-1.5 rounded-lg text-[9px] text-white border border-slate-800" value="${d.pin}">
                     </div>`;
                 contenedor.appendChild(div);
-            } else {
-                const rec = document.getElementById(cleanId);
-                if (rec) rec.remove();
-                if (contenedor.innerHTML === '') contenedor.innerHTML = '<p class="text-slate-700 italic text-center py-10 border-2 border-dashed border-slate-800 rounded-xl">Selecciona plataformas arriba para empezar</p>';
-            }
+            });
         }
 
         async function guardarEnGoogle() {
             const btn = document.getElementById('btnGuardar');
             const nom = document.getElementById('nombre').value.toUpperCase().trim();
             const blocks = document.querySelectorAll('.data-block');
-            if (!nom || blocks.length === 0) return alert("Falta nombre o seleccionar servicios");
+            
+            if (!nom || blocks.length === 0) return alert("Error: Debes ingresar el nombre y al menos un servicio.");
 
-            btn.innerText = "PROCESANDO COMBO..."; btn.disabled = true;
+            btn.innerText = "REGISTRANDO..."; btn.disabled = true;
             let c=[], k=[], p=[], n=[], s=[];
+            
             blocks.forEach(b => {
                 s.push(b.dataset.plataforma);
                 c.push(b.querySelector('.val-correo').value.trim() || '---');
@@ -130,19 +157,36 @@
             });
 
             const payload = {
-                id: Date.now(), nombre: nom, telefono: document.getElementById('telefono').value.trim(),
-                servicio: s.join(" + "), costo: document.getElementById('costo').value || 0,
-                precio: document.getElementById('precio').value || 0, correo: c.join(" , "),
-                clave: k.join(" , "), perfil: p.join(" , "), pin: n.join(" , "),
+                id: Date.now(),
+                nombre: nom,
+                telefono: document.getElementById('telefono').value.trim(),
+                servicio: s.join(" + "),
+                costo: document.getElementById('costo').value || 0,
+                precio: document.getElementById('precio').value || 0,
+                correo: c.join(" , "),
+                clave: k.join(" , "),
+                perfil: p.join(" , "),
+                pin: n.join(" , "),
                 vencimiento: document.getElementById('vencimiento').value
             };
 
-            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-            setTimeout(() => location.reload(), 800);
+            try {
+                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                alert("¡Registro Exitoso!");
+                location.reload();
+            } catch (e) {
+                alert("Error de conexión");
+                btn.disabled = false;
+                btn.innerText = "Registrar de nuevo";
+            }
         }
 
         async function cargarDatos() {
-            try { const r = await fetch(API_URL); clientesGlobal = await r.json(); renderizarTabla(); } catch(e) {}
+            try { 
+                const r = await fetch(API_URL); 
+                clientesGlobal = await r.json(); 
+                renderizarTabla(); 
+            } catch(e) { console.error("Error cargando datos"); }
         }
 
         function renderizarTabla() {
@@ -153,29 +197,41 @@
 
             let fil = clientesGlobal.filter(c => c[1].toString().toLowerCase().includes(buscar) || c[3].toString().toLowerCase().includes(buscar));
             let html = "";
+            
             fil.forEach(c => {
                 const fV = procesarFecha(c[10]);
                 const dias = Math.ceil((fV.getTime() - hoy.getTime()) / (1000*60*60*24));
                 const fR = new Date(parseInt(c[0]));
-                const cost = parseFloat(c[4]) || 0; const prec = parseFloat(c[5]) || 0;
+                const cost = parseFloat(c[4]) || 0; 
+                const prec = parseFloat(c[5]) || 0;
 
                 if(!isNaN(fR.getTime())) {
                     if(fR.toDateString() === hoy.toDateString()) { vD += prec; cD += cost; }
                     if(fR.getMonth() === hoy.getMonth() && fR.getFullYear() === 2026) uM += (prec - cost);
                     if(fR.getFullYear() === 2026) uA += (prec - cost);
                 }
+                
                 let color = dias <= 0 ? "status-red" : (dias <= 3 ? "status-yellow" : "status-green");
+                
                 html += `<tr class="border-b border-slate-800 hover:bg-slate-900/50 transition-all">
-                    <td class="p-5"><span class="text-blue-400 font-black">${c[1]}</span><br><span class="text-slate-500 text-[9px]">${c[3]}</span></td>
-                    <td class="p-5 text-center"><span class="px-3 py-1 rounded-full border font-black ${color}">${dias <= 0 ? 'VENCIDO' : dias + ' DÍAS'}</span></td>
-                    <td class="p-5 text-center text-slate-500 font-mono">${isNaN(fV.getTime()) ? '---' : fV.toISOString().split('T')[0]}</td>
-                    <td class="p-5 text-center space-x-1">
-                        <button onclick="wsAcceso('${c[0]}')" class="bg-blue-600 px-4 py-2 rounded-xl shadow-lg font-black text-[10px] hover:bg-blue-500 active:scale-90 transition-all">ENTREGA</button>
+                    <td class="p-5">
+                        <span class="text-blue-400 font-black text-xs">${c[1]}</span><br>
+                        <span class="text-slate-500 text-[8px] tracking-tighter">${c[3]}</span>
                     </td>
-                    <td class="p-5 text-center"><button onclick="eliminar('${c[0]}')" class="text-slate-800 hover:text-red-500 font-bold">✖</button></td>
+                    <td class="p-5 text-center">
+                        <span class="px-3 py-1 rounded-full border font-black ${color}">${dias <= 0 ? 'VENCIDO' : dias + ' DÍAS'}</span>
+                    </td>
+                    <td class="p-5 text-center text-slate-500 font-mono text-[9px]">${isNaN(fV.getTime()) ? '---' : fV.toISOString().split('T')[0]}</td>
+                    <td class="p-5 text-center">
+                        <button onclick="wsAcceso('${c[0]}')" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-xl shadow-lg font-black text-[10px] active:scale-90 transition-all">ENTREGAR</button>
+                    </td>
+                    <td class="p-5 text-center">
+                        <button onclick="eliminar('${c[0]}')" class="text-slate-800 hover:text-red-600 font-bold transition-colors">✖</button>
+                    </td>
                 </tr>`;
             });
-            tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center text-slate-600">Sin registros encontrados</td></tr>';
+            
+            tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center text-slate-700">No se encontraron registros activos</td></tr>';
             document.getElementById('gananciaDia').innerText = `$${vD.toFixed(2)}`;
             document.getElementById('costoDia').innerText = `$${cD.toFixed(2)}`;
             document.getElementById('netoDia').innerText = `$${(vD-cD).toFixed(2)}`;
@@ -191,7 +247,7 @@
         }
 
         async function eliminar(id) {
-            if(confirm("¿Eliminar este registro?")) {
+            if(confirm("¿Estás seguro de que quieres eliminar este cliente?")) {
                 await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', id: id }) });
                 location.reload();
             }
@@ -211,31 +267,31 @@
             let mensajeFinal = "";
 
             if (servicios.length > 1) {
+                // FORMATO COMBO PREMIUM
                 let bloqueServicios = "";
                 servicios.forEach((s, i) => {
-                    bloqueServicios += `\n📺 SERVICIO: ${s.trim()}\n` +
-                                       `✉️ Usuario: ${(correos[i] || correos[0] || '---').trim()}\n` +
-                                       `🔑 Clave: ${(claves[i] || claves[0] || '---').trim()}\n` +
-                                       `👤 Perfil: ${(perfiles[i] || perfiles[0] || '---').trim()}\n` +
-                                       `🔐 PIN: ${(pins[i] || pins[0] || '---').trim()}\n` +
-                                       `🗓 Vence: ${fechaVenc}\n` +
+                    bloqueServicios += `\n📺 *SERVICIO:* ${s.trim()}\n` +
+                                       `✉️ *Usuario:* ${(correos[i] || correos[0] || '---').trim()}\n` +
+                                       `🔑 *Clave:* ${(claves[i] || claves[0] || '---').trim()}\n` +
+                                       `👤 *Perfil:* ${(perfiles[i] || perfiles[0] || '---').trim()}\n` +
+                                       `🔐 *PIN:* ${(pins[i] || pins[0] || '---').trim()}\n` +
+                                       `🗓 *Vence:* ${fechaVenc}\n` +
                                        `------------------------------\n`;
                 });
 
                 mensajeFinal = `🚀 *SERVICIOS ACTIVOS - ${cliente[1]}* ⭐\n` +
-                               `Gracias por tu compra en *Streaming Planet*\n\n` +
+                               `Gracias por preferir *Streaming Planet*\n\n` +
                                `------------------------------` + 
                                bloqueServicios +
-                               `🚨 *REGLAS IMPORTANTES:*\n` +
-                               `* No cambiar datos de la cuenta.\n` +
-                               `* Usar solo el perfil asignado.\n` +
-                               `* Disfruta tu programación 🍿`;
+                               `🚨 *REGLAS:* No modificar datos ni perfiles ajenos.\n` +
+                               `🍿 ¡Que disfrutes tu combo!`;
             } else {
+                // FORMATO INDIVIDUAL
                 mensajeFinal = `🚀 *SERVICIO ACTIVO - ${cliente[1]}* ⭐\n` +
-                               `Gracias por tu compra en *Streaming Planet*\n\n` +
+                               `Gracias por preferir *Streaming Planet*\n\n` +
                                `📺 *SERVICIO:* ${servicios[0].trim()}\n` +
                                `✉️ *Usuario:* ${correos[0].trim()}\n` +
-                               `🔑 *Clave:* ${claves[0].trim()}\n` +
+                               `🔑 *Contraseña:* ${claves[0].trim()}\n` +
                                `👤 *Perfil:* ${perfiles[0].trim()}\n` +
                                `🔐 *PIN:* ${pins[0].trim()}\n` +
                                `🗓 *Vence:* ${fechaVenc}\n\n` +
@@ -248,7 +304,9 @@
         }
 
         window.onload = () => {
-            initGrid(); cargarDatos();
+            initGrid(); 
+            cargarDatos();
+            // Default 30 días
             document.getElementById('vencimiento').value = new Date(Date.now() + 2592000000).toISOString().split('T')[0];
         };
     </script>
