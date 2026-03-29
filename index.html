@@ -17,6 +17,7 @@
 </head>
 <body class="text-slate-300 font-sans pb-10">
 
+    <!-- DASHBOARD -->
     <div class="grid grid-cols-2 md:grid-cols-5 gap-3 p-4 sticky top-0 z-50 bg-slate-950/80 backdrop-blur-md">
         <div class="bg-slate-900 p-3 rounded-2xl border border-slate-800 text-center">
             <p class="text-[9px] uppercase text-slate-500 font-bold">Ventas Hoy</p>
@@ -40,14 +41,15 @@
         </div>
     </div>
 
-    <div class="max-w-6xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
         
+        <!-- COLUMNA IZQUIERDA: FORMULARIO -->
         <div class="lg:col-span-1 space-y-4">
             <div class="bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-xl">
                 <h3 class="text-blue-500 font-black text-xs uppercase mb-4 italic">Nuevo Registro</h3>
                 <div class="space-y-3">
                     <input type="text" id="nombre" placeholder="NOMBRE CLIENTE" class="w-full bg-slate-950 p-3 rounded-xl border border-slate-800 outline-none focus:border-blue-500 uppercase font-bold text-white text-xs">
-                    <input type="number" id="telefono" placeholder="WHATSAPP (58412...)" class="w-full bg-slate-950 p-3 rounded-xl border border-slate-800 outline-none text-white text-xs">
+                    <input type="number" id="telefono" placeholder="WHATSAPP (Ej: 58412...)" class="w-full bg-slate-950 p-3 rounded-xl border border-slate-800 outline-none text-white text-xs">
                     
                     <p class="text-[9px] font-bold text-slate-600 uppercase pt-2">Servicios:</p>
                     <div id="gridPlataformas" class="grid grid-cols-3 gap-1.5 max-h-40 overflow-y-auto p-1"></div>
@@ -72,28 +74,31 @@
             </div>
         </div>
 
+        <!-- COLUMNA DERECHA: TABLA -->
         <div class="lg:col-span-2 bg-slate-900 rounded-3xl border border-slate-800 shadow-xl overflow-hidden">
             <div class="p-4 bg-slate-950/50">
                 <input type="text" id="buscador" oninput="renderizarTabla()" placeholder="Buscar por nombre o plataforma..." class="w-full bg-slate-950 p-3 rounded-2xl border border-slate-800 outline-none text-xs text-white">
             </div>
-            <div class="overflow-x-auto max-h-[600px]">
+            <div class="overflow-x-auto max-h-[700px]">
                 <table class="w-full text-left text-[10px]">
-                    <thead class="bg-slate-950 text-slate-500 uppercase text-[8px] sticky top-0">
+                    <thead class="bg-slate-950 text-slate-500 uppercase text-[8px] sticky top-0 z-10">
                         <tr>
                             <th class="p-4">Cliente / Combo</th>
-                            <th class="p-4 text-center">Días</th>
+                            <th class="p-4 text-center">Estado</th>
                             <th class="p-4 text-center">Vence</th>
-                            <th class="p-4 text-center">Cobros / Gestión</th>
+                            <th class="p-4 text-center">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="cuerpoTabla" class="divide-y divide-slate-800/50"></tbody>
+                    <tbody id="cuerpoTabla" class="divide-y divide-slate-800/50">
+                        <tr><td colspan="4" class="p-10 text-center text-slate-600 italic">Cargando base de datos...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <script>
-        const API_URL = "TU_URL_DE_APPS_SCRIPT_AQUI";
+        const API_URL = "https://script.google.com/macros/s/AKfycbxRFID-dOQuNJcC2b74GmpYXJ9Do6w5U0yQy89IPy1Y805owu__Xce3yRI9eDBnVpjz/exec";
         let clientesGlobal = [];
         let datosTemporales = {}; 
 
@@ -104,7 +109,7 @@
             listaPlat.forEach(p => {
                 const btn = document.createElement('button');
                 btn.innerText = p;
-                btn.className = "btn-plataforma p-1.5 rounded-lg text-[7px] font-bold bg-slate-800 text-slate-400 border border-slate-700";
+                btn.className = "btn-plataforma p-1.5 rounded-lg text-[7px] font-bold bg-slate-800 text-slate-400 border border-slate-700 hover:border-blue-500";
                 btn.onclick = () => togglePlataforma(btn, p);
                 grid.appendChild(btn);
             });
@@ -128,7 +133,7 @@
         function renderizarFormularios() {
             const contenedor = document.getElementById('contenedorDatosDinamicos');
             const activos = document.querySelectorAll('.btn-plataforma.active');
-            contenedor.innerHTML = activos.length === 0 ? '<p class="text-slate-700 text-center py-4 text-[9px] uppercase">Sin servicios</p>' : '';
+            contenedor.innerHTML = activos.length === 0 ? '<p class="text-slate-700 text-center py-4 text-[9px] uppercase">Sin servicios seleccionados</p>' : '';
             activos.forEach(btn => {
                 const n = btn.innerText;
                 const d = datosTemporales[n] || { correo: '', clave: '', perfil: '', pin: '' };
@@ -136,15 +141,26 @@
                 div.className = "bg-slate-950 p-3 rounded-xl border border-blue-900/40 data-block";
                 div.dataset.plataforma = n;
                 div.innerHTML = `
-                    <p class="text-blue-400 font-bold text-[8px] mb-2">${n}</p>
-                    <input type="text" placeholder="Correo" class="val-correo w-full bg-transparent border-b border-slate-800 p-1 outline-none text-white text-[10px] mb-1" value="${d.correo}">
-                    <input type="text" placeholder="Clave" class="val-clave w-full bg-transparent border-b border-slate-800 p-1 outline-none text-white text-[10px] mb-2" value="${d.clave}">
+                    <p class="text-blue-400 font-bold text-[8px] mb-2 uppercase tracking-widest">${n}</p>
+                    <input type="text" placeholder="Usuario / Correo" class="val-correo w-full bg-transparent border-b border-slate-800 p-1 outline-none text-white text-[10px] mb-1 focus:border-blue-500" value="${d.correo}">
+                    <input type="text" placeholder="Contraseña" class="val-clave w-full bg-transparent border-b border-slate-800 p-1 outline-none text-white text-[10px] mb-2 focus:border-blue-500" value="${d.clave}">
                     <div class="flex gap-2">
-                        <input type="text" placeholder="P" class="val-perfil bg-slate-900 w-1/2 p-1 rounded text-[9px] text-white" value="${d.perfil}">
-                        <input type="text" placeholder="PIN" class="val-pin bg-slate-900 w-1/2 p-1 rounded text-[9px] text-white" value="${d.pin}">
+                        <input type="text" placeholder="Perfil" class="val-perfil bg-slate-900 w-1/2 p-1.5 rounded text-[9px] text-white border border-slate-800 focus:border-blue-900" value="${d.perfil}">
+                        <input type="text" placeholder="PIN" class="val-pin bg-slate-900 w-1/2 p-1.5 rounded text-[9px] text-white border border-slate-800 focus:border-blue-900" value="${d.pin}">
                     </div>`;
                 contenedor.appendChild(div);
             });
+        }
+
+        async function cargarDatos() {
+            try {
+                const resp = await fetch(API_URL);
+                clientesGlobal = await resp.json();
+                renderizarTabla();
+            } catch (err) {
+                console.error("Error al cargar:", err);
+                document.getElementById('cuerpoTabla').innerHTML = '<tr><td colspan="4" class="p-10 text-center text-red-500 font-bold">Error al conectar con la base de datos. Verifica la URL.</td></tr>';
+            }
         }
 
         async function guardarEnGoogle() {
@@ -152,7 +168,8 @@
             const nom = document.getElementById('nombre').value.toUpperCase().trim();
             const blocks = document.querySelectorAll('.data-block');
             if (!nom || blocks.length === 0) return alert("Falta nombre o servicios");
-            btn.innerText = "REGISTRANDO..."; btn.disabled = true;
+            
+            btn.innerText = "PROCESANDO..."; btn.disabled = true;
             
             let c=[], k=[], p=[], n=[], s=[];
             blocks.forEach(b => {
@@ -171,14 +188,17 @@
                 vencimiento: document.getElementById('vencimiento').value
             };
 
-            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(pay) });
-            location.reload();
-        }
-
-        async function cargarDatos() {
-            const r = await fetch(API_URL); 
-            clientesGlobal = await r.json(); 
-            renderizarTabla();
+            try {
+                await fetch(API_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify(pay)
+                });
+                // Recarga forzada para ver cambios
+                location.reload();
+            } catch (e) {
+                alert("Guardado enviado. Si no recarga solo, actualiza la página.");
+                location.reload();
+            }
         }
 
         function renderizarTabla() {
@@ -198,26 +218,27 @@
 
                 if(!isNaN(fR.getTime())) {
                     if(fR.toDateString() === hoy.toDateString()) { vD += Number(c[5]); cD += Number(c[4]); }
-                    if(fR.getMonth() === hoy.getMonth()) uM += util;
+                    if(fR.getMonth() === hoy.getMonth() && fR.getFullYear() === 2026) uM += util;
                     uA += util;
                 }
 
                 let color = dias <= 0 ? "status-red" : (dias <= 3 ? "status-yellow" : "status-green");
                 
                 html += `<tr>
-                    <td class="p-4 font-bold text-white uppercase text-[9px]">${c[1]}<br><span class="text-slate-500 font-normal italic text-[8px]">${c[3]}</span></td>
-                    <td class="p-4 text-center"><span class="px-2 py-0.5 rounded-full border font-black ${color}">${dias <= 0 ? 'VENCIDO' : dias + ' D'}</span></td>
+                    <td class="p-4"><span class="text-blue-400 font-bold uppercase text-[9px]">${c[1]}</span><br><span class="text-slate-500 italic text-[8px]">${c[3]}</span></td>
+                    <td class="p-4 text-center"><span class="px-2 py-0.5 rounded-full border font-black ${color}">${dias <= 0 ? 'VENCIDO' : dias + ' DÍAS'}</span></td>
                     <td class="p-4 text-center text-slate-500 font-mono text-[9px]">${isNaN(fV.getTime()) ? '---' : fV.toISOString().split('T')[0]}</td>
                     <td class="p-4 flex gap-1 justify-center">
-                        <button onclick="wsAcceso('${c[0]}')" class="bg-blue-600 px-2 py-1 rounded-md font-bold text-[8px]">DATOS</button>
-                        <button onclick="renovar('${c[0]}')" class="bg-emerald-600 px-2 py-1 rounded-md font-bold text-[8px]">RENOVAR</button>
-                        <button onclick="enviarMensaje('${c[0]}', 3)" class="bg-yellow-500 text-black px-2 py-1 rounded-md font-bold text-[8px]">3 DÍAS</button>
-                        <button onclick="enviarMensaje('${c[0]}', 0)" class="bg-red-600 px-2 py-1 rounded-md font-bold text-[8px]">VENCE HOY</button>
-                        <button onclick="eliminar('${c[0]}')" class="text-slate-700 ml-2">✖</button>
+                        <button onclick="wsAcceso('${c[0]}')" class="bg-blue-600 px-2 py-1 rounded-md font-bold text-[8px] hover:bg-blue-500">ACCESO</button>
+                        <button onclick="renovar('${c[0]}')" class="bg-emerald-600 px-2 py-1 rounded-md font-bold text-[8px] hover:bg-emerald-500">RENOVAR</button>
+                        <button onclick="enviarMensaje('${c[0]}', 3)" class="bg-yellow-500 text-black px-2 py-1 rounded-md font-bold text-[8px] hover:bg-yellow-400">AVISO 3D</button>
+                        <button onclick="enviarMensaje('${c[0]}', 0)" class="bg-red-600 px-2 py-1 rounded-md font-bold text-[8px] hover:bg-red-500">AVISO 0D</button>
+                        <button onclick="eliminar('${c[0]}')" class="text-slate-700 ml-2 hover:text-red-500 transition-colors">✖</button>
                     </td>
                 </tr>`;
             });
-            tabla.innerHTML = html;
+            tabla.innerHTML = html || '<tr><td colspan="4" class="p-10 text-center">No se encontraron registros</td></tr>';
+            
             document.getElementById('gananciaDia').innerText = `$${vD.toFixed(2)}`;
             document.getElementById('costoDia').innerText = `$${cD.toFixed(2)}`;
             document.getElementById('netoDia').innerText = `$${(vD-cD).toFixed(2)}`;
@@ -228,8 +249,8 @@
         function enviarMensaje(id, tipo) {
             const c = clientesGlobal.find(x => x[0] == id);
             let msj = tipo === 3 
-                ? `Hola *${c[1]}* 👋\n\nTe recordamos de *Streaming Planet* 🚀 que tu servicio de *${c[3]}* vence en *3 días*. ¿Deseas renovar? 🍿`
-                : `¡Hola *${c[1]}*! 🚨\n\nTu servicio de *${c[3]}* **VENCE HOY**. Te recomendamos renovar para evitar cortes. ¡Gracias! ⭐`;
+                ? `Hola *${c[1]}* 👋\n\nTe recordamos de *Streaming Planet* 🚀 que tu servicio de *${c[3]}* vence en *3 días*. ¿Deseas renovar para no perder tu acceso? 🍿`
+                : `¡Hola *${c[1]}*! 🚨\n\nTu servicio de *${c[3]}* **VENCE HOY**. Para evitar cortes en la pantalla, te recomendamos renovar antes de finalizar el día. ⭐\n\n¡Quedamos atentos!`;
             window.open(`https://api.whatsapp.com/send?phone=${c[2].toString().replace(/\D/g, '')}&text=${encodeURIComponent(msj)}`, "_blank");
         }
 
@@ -238,9 +259,9 @@
             const servs = c[3].split(" + "), cors = c[6].split(" , "), keys = c[7].split(" , "), perfs = c[8].split(" , "), pins = c[9].split(" , ");
             let body = "";
             servs.forEach((s, i) => {
-                body += `📺 SERVICIO: ${s}\n✉️ User: ${cors[i]||cors[0]}\n🔑 Pass: ${keys[i]||keys[0]}\n👤 Perfil: ${perfs[i]||perfs[0]}\n🔐 PIN: ${pins[i]||pins[0]}\n--------------------\n`;
+                body += `📺 SERVICIO: ${s.trim()}\n✉️ User: ${(cors[i]||cors[0]).trim()}\n🔑 Pass: ${(keys[i]||keys[0]).trim()}\n👤 Perfil: ${(perfs[i]||perfs[0]).trim()}\n🔐 PIN: ${(pins[i]||pins[0]).trim()}\n--------------------\n`;
             });
-            const msj = `🚀 ACCESOS - ${c[1]}\n\n${body}🗓 Vence: ${procesarFecha(c[10]).toISOString().split('T')[0]}\n\n*Streaming Planet* agradece tu preferencia ⭐`;
+            const msj = `🚀 ACCESOS - ${c[1]} ⭐\n\n${body}🗓 Vence: ${procesarFecha(c[10]).toISOString().split('T')[0]}\n\n¡Gracias por preferir *Streaming Planet*!`;
             window.open(`https://api.whatsapp.com/send?phone=${c[2].toString().replace(/\D/g, '')}&text=${encodeURIComponent(msj)}`, "_blank");
         }
 
@@ -251,17 +272,21 @@
             return p.length >= 3 ? (p[0].length === 4 ? new Date(p[0], p[1]-1, p[2]) : new Date(p[2], p[1]-1, p[0])) : new Date(v);
         }
 
-        async function eliminar(id) { if(confirm("¿Borrar?")) { await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', id: id }) }); location.reload(); } }
+        async function eliminar(id) { if(confirm("¿Eliminar registro permanentemente?")) { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'DELETE', id: id }) }); location.reload(); } }
         async function renovar(id) { 
             const c = clientesGlobal.find(x => x[0] == id);
-            if(confirm("¿Sumar 30 días?")) {
+            if(confirm(`¿Renovar 30 días a ${c[1]}?`)) {
                 let fv = procesarFecha(c[10]); fv.setDate(fv.getDate() + 30);
-                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'UPDATE', id: id, vencimiento: fv.toISOString().split('T')[0] }) });
+                await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'UPDATE', id: id, vencimiento: fv.toISOString().split('T')[0] }) });
                 location.reload();
             }
         }
 
-        window.onload = () => { initGrid(); cargarDatos(); document.getElementById('vencimiento').value = new Date(Date.now() + 2592000000).toISOString().split('T')[0]; };
+        window.onload = () => { 
+            initGrid(); 
+            cargarDatos(); 
+            document.getElementById('vencimiento').value = new Date(Date.now() + 2592000000).toISOString().split('T')[0]; 
+        };
     </script>
 </body>
 </html>
