@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Streaming Planet 2026</title>
+    <title>Streaming Planet 2026 - Gestión Externa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .loading { animation: pulse 2s infinite; }
@@ -11,7 +11,6 @@
         .status-red { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
         .status-yellow { background: rgba(234, 179, 8, 0.2); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.4); }
         .status-green { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.4); }
-        body { background-color: #020617; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 p-4 font-sans text-[11px]">
@@ -60,19 +59,18 @@
                         <option>SPOTIFY</option>
                         <option>CRUNCHYROLL</option>
                         <option>VIKI RAKUTEN</option>
-                        <option>OLEADA TV</option>
                         <option>CANVA PRO</option>
                     </select>
                     <div class="grid grid-cols-2 gap-2">
                         <input id="costo" type="number" step="0.01" placeholder="Costo $" class="bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white">
                         <input id="precio" type="number" step="0.01" placeholder="Venta $" class="bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold text-green-400">
                     </div>
-                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-2 text-white">
-                        <input id="correo" type="text" placeholder="Usuario / Correo" class="w-full bg-transparent border-b border-slate-800 p-1 outline-none">
-                        <input id="clave" type="text" placeholder="Contraseña" class="w-full bg-transparent border-b border-slate-800 p-1 outline-none">
+                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 space-y-2">
+                        <input id="correo" type="text" placeholder="Usuario / Correo" class="w-full bg-transparent border-b border-slate-800 p-1 outline-none text-white">
+                        <input id="clave" type="text" placeholder="Contraseña" class="w-full bg-transparent border-b border-slate-800 p-1 outline-none text-white">
                         <div class="grid grid-cols-2 gap-2 mt-2">
-                            <input id="perfil" type="text" placeholder="Perfil" class="bg-slate-800 p-1 rounded text-[9px]">
-                            <input id="pin" type="text" placeholder="PIN" class="bg-slate-800 p-1 rounded text-[9px]">
+                            <input id="perfil" type="text" placeholder="Perfil" class="bg-slate-800 p-1 rounded text-white">
+                            <input id="pin" type="text" placeholder="PIN" class="bg-slate-800 p-1 rounded text-white">
                         </div>
                     </div>
                     <input id="vencimiento" type="date" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold text-white">
@@ -82,7 +80,7 @@
 
             <div class="lg:col-span-3 bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-slate-800">
-                    <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="Buscar cliente..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-white outline-none">
+                    <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="Buscar cliente o servicio..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-white outline-none">
                 </div>
                 <div class="overflow-x-auto max-h-[600px]">
                     <table class="w-full text-left">
@@ -96,7 +94,7 @@
                             </tr>
                         </thead>
                         <tbody id="cuerpoTabla" class="divide-y divide-slate-800 text-white font-bold uppercase">
-                            <tr><td colspan="5" class="p-20 text-center loading uppercase font-black text-slate-500">Sincronizando...</td></tr>
+                            <tr><td colspan="5" class="p-20 text-center loading uppercase font-black text-slate-600">Sincronizando con Google...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -104,122 +102,6 @@
         </div>
     </div>
 
-    <script>
-        let clientesGlobal = [];
-
-        function establecerFechaPredeterminada() {
-            const fechaFutura = new Date();
-            fechaFutura.setDate(fechaFutura.getDate() + 30);
-            document.getElementById('vencimiento').value = fechaFutura.toISOString().split('T')[0];
-        }
-
-        function cargarDatos() {
-            google.script.run.withSuccessHandler(data => {
-                clientesGlobal = data.slice(1);
-                renderizarTabla();
-            }).getData();
-        }
-
-        function procesarFecha(valor) {
-            if (!valor) return new Date(0);
-            return new Date(valor + "T12:00:00");
-        }
-
-        function renderizarTabla() {
-            const tabla = document.getElementById('cuerpoTabla');
-            const busqueda = document.getElementById('buscador').value.toLowerCase();
-            const hoy = new Date(); hoy.setHours(0,0,0,0);
-            let vDia = 0, cDia = 0, uMes = 0, uAnio = 0;
-
-            let html = "";
-            clientesGlobal.filter(c => c[1].toString().toLowerCase().includes(busqueda) || c[3].toString().toLowerCase().includes(busqueda))
-            .forEach(c => {
-                const fechaV = procesarFecha(c[10]);
-                const diff = fechaV.getTime() - hoy.getTime();
-                const dias = Math.ceil(diff / (1000 * 60 * 60 * 24));
-                const fReg = new Date(parseInt(c[0]));
-                const costoItem = parseFloat(c[4]) || 0;
-                const ventaItem = parseFloat(c[5]) || 0;
-                const gan = ventaItem - costoItem;
-
-                if(!isNaN(fReg.getTime())) {
-                    if(fReg.toDateString() === hoy.toDateString()) { vDia += ventaItem; cDia += costoItem; }
-                    if(fReg.getMonth() === hoy.getMonth() && fReg.getFullYear() === 2026) uMes += gan;
-                    uAnio += gan;
-                }
-
-                let clse = dias <= 0 ? "status-red" : (dias <= 3 ? "status-yellow" : "status-green");
-                
-                html += `
-                    <tr class="hover:bg-slate-800/40 border-b border-slate-800/50 transition-colors">
-                        <td class="p-4 text-blue-400 font-bold uppercase">${c[1]}<br><span class="text-slate-500 font-black">${c[3]}</span></td>
-                        <td class="p-4 text-center">
-                            <span class="px-2 py-1 rounded-full border font-black ${clse}">
-                                ${dias <= 0 ? (dias === 0 ? 'VENCE HOY' : 'VENCIDO') : dias + ' DIAS'}
-                            </span>
-                        </td>
-                        <td class="p-4 text-center text-slate-500 font-mono">${c[10]}</td>
-                        <td class="p-4 text-center space-x-1">
-                            <button onclick="wsAcceso('${c[0]}')" class="bg-blue-600 px-3 py-1.5 rounded font-black uppercase text-[9px]">Entrega</button>
-                            <button onclick="renovar('${c[0]}')" class="bg-indigo-600 px-3 py-1.5 rounded font-black uppercase text-[9px]">Renovar</button>
-                        </td>
-                        <td class="p-4 text-center"><button onclick="eliminar('${c[0]}')" class="text-slate-700 hover:text-red-500 font-bold text-lg">✖</button></td>
-                    </tr>`;
-            });
-
-            tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center uppercase font-black text-slate-600">No hay registros</td></tr>';
-            document.getElementById('gananciaDia').innerText = `$${vDia.toFixed(2)}`;
-            document.getElementById('costoDia').innerText = `$${cDia.toFixed(2)}`;
-            document.getElementById('netoDia').innerText = `$${(vDia - cDia).toFixed(2)}`;
-            document.getElementById('gananciaMes').innerText = `$${uMes.toFixed(2)}`;
-            document.getElementById('gananciaAnio').innerText = `$${uAnio.toFixed(2)}`;
-        }
-
-        function guardarEnGoogle() {
-            const btn = document.getElementById('btnGuardar');
-            const data = {
-                id: Date.now(),
-                nombre: document.getElementById('nombre').value.toUpperCase().trim(),
-                telefono: document.getElementById('telefono').value.trim(),
-                servicio: document.getElementById('servicio').value,
-                costo: document.getElementById('costo').value || 0,
-                precio: document.getElementById('precio').value || 0,
-                correo: document.getElementById('correo').value.trim(),
-                clave: document.getElementById('clave').value.trim(),
-                perfil: document.getElementById('perfil').value.trim(),
-                pin: document.getElementById('pin').value.trim(),
-                vencimiento: document.getElementById('vencimiento').value
-            };
-            if(!data.nombre) return alert("Nombre obligatorio");
-            btn.innerText = "ESPERE..."; btn.disabled = true;
-            google.script.run.withSuccessHandler(() => location.reload()).doPost({ postData: { contents: JSON.stringify(data) } });
-        }
-
-        function renovar(id) {
-            const c = clientesGlobal.find(x => x[0] == id);
-            let fV = procesarFecha(c[10]);
-            fV.setDate(fV.getDate() + 30);
-            const nueva = fV.toISOString().split('T')[0];
-            if(confirm("¿Sumar 30 días adicionales? Nueva fecha: " + nueva)) {
-                google.script.run.withSuccessHandler(() => location.reload())
-                .doPost({ postData: { contents: JSON.stringify({ action: 'UPDATE_FIELD', id: id, vencimiento: nueva }) } });
-            }
-        }
-
-        function eliminar(id) {
-            if(confirm("¿Eliminar?")) {
-                google.script.run.withSuccessHandler(() => location.reload())
-                .doPost({ postData: { contents: JSON.stringify({ action: 'DELETE', id: id }) } });
-            }
-        }
-
-        function wsAcceso(id) {
-            const c = clientesGlobal.find(x => x[0] == id);
-            const msj = `🚀 *SERVICIOS ACTIVOS* ⭐\n\n📺 *SERVICIO:* ${c[3]}\n✉️ *Usuario:* ${c[6]}\n🔑 *Clave:* ${c[7]}\n👤 *Perfil:* ${c[8]}\n🔐 *PIN:* ${c[9]}\n🗓️ *Vence:* ${c[10]}\n\nGracias por tu compra en Planet Streaming 🍿`;
-            window.open(`https://wa.me/${c[2].toString().replace(/\D/g, '')}?text=${encodeURIComponent(msj)}`, '_blank');
-        }
-
-        window.onload = () => { cargarDatos(); establecerFechaPredeterminada(); };
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
