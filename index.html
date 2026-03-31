@@ -3,125 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planet Streaming Admin Pro | v3.1</title>
+    <title>Planet Streaming Admin | v3.5 Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --bg: #0b0f1a; --card: #161b2c; --border: #1e293b; --blue: #2563eb; }
-        body { background: var(--bg); color: #e2e8f0; font-family: 'Inter', sans-serif; }
-        .sidebar-card { background: var(--card); border: 1px solid var(--border); border-radius: 1.5rem; padding: 1.5rem; }
-        .input-dark { background: var(--bg); border: 1px solid var(--border); border-radius: 0.6rem; padding: 0.7rem; width: 100%; color: white; font-size: 11px; outline: none; }
-        .input-dark:focus { border-color: var(--blue); }
-        .grid-services { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; max-height: 160px; overflow-y: auto; padding-right: 5px; }
-        .btn-service { background: #1e293b; border: 1px solid #334155; border-radius: 0.6rem; padding: 0.5rem; font-size: 9px; color: #94a3b8; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
-        .btn-service.active { background: var(--blue); color: white; border-color: #60a5fa; box-shadow: 0 0 10px rgba(37, 99, 235, 0.4); }
-        .status-pill { border-radius: 20px; padding: 3px 10px; font-weight: 900; font-size: 9px; border: 2px solid; text-align: center; display: inline-block; min-width: 75px; }
+        body { background: var(--bg); color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .sidebar-card { background: var(--card); border: 1px solid var(--border); border-radius: 1.5rem; padding: 1.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); }
+        .input-dark { background: var(--bg); border: 1px solid var(--border); border-radius: 0.6rem; padding: 0.7rem; width: 100%; color: white; font-size: 11px; outline: none; transition: 0.2s; }
+        .input-dark:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); }
+        .grid-services { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; max-height: 180px; overflow-y: auto; padding-right: 5px; }
+        .btn-service { background: #1e293b; border: 1px solid #334155; border-radius: 0.6rem; padding: 0.6rem; font-size: 9px; color: #94a3b8; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        .btn-service.active { background: var(--blue); color: white; border-color: #60a5fa; box-shadow: 0 0 12px rgba(37, 99, 235, 0.4); }
+        .status-pill { border-radius: 20px; padding: 4px 12px; font-weight: 900; font-size: 9px; border: 2px solid; text-align: center; display: inline-block; min-width: 85px; text-transform: uppercase; }
         .status-green { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: #10b981; }
         .status-yellow { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-color: #f59e0b; }
         .status-red { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: #ef4444; }
-        .action-btn { border-radius: 6px; padding: 6px 10px; font-size: 10px; font-weight: 800; color: white; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .action-btn { border-radius: 8px; padding: 8px 12px; font-size: 10px; font-weight: 800; color: white; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; border: none; cursor: pointer; }
         .action-btn:hover { opacity: 0.8; transform: translateY(-1px); }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
 </head>
-<body class="p-4">
+<body class="p-4 md:p-8">
 
-    <div class="max-w-[1500px] mx-auto grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-        <div class="sidebar-card text-center border-b-4 border-slate-700">
-            <p class="text-slate-500 text-[10px] font-bold uppercase">Ventas Hoy</p>
-            <p id="gananciaDia" class="text-2xl font-black">$0.00</p>
-        </div>
-        <div class="sidebar-card text-center border-b-4 border-red-500/50">
-            <p class="text-slate-500 text-[10px] font-bold uppercase">Costos Hoy</p>
-            <p id="costoDia" class="text-2xl font-black text-red-500">$0.00</p>
-        </div>
-        <div class="sidebar-card text-center border-b-4 border-blue-500/50">
-            <p class="text-slate-500 text-[10px] font-bold uppercase">Neto Hoy</p>
-            <p id="netoDia" class="text-2xl font-black text-blue-400">$0.00</p>
-        </div>
-        <div class="sidebar-card text-center border-b-4 border-emerald-500/50">
-            <p class="text-slate-500 text-[10px] font-bold uppercase">Mes (Utilidad)</p>
-            <p id="gananciaMes" class="text-2xl font-black text-emerald-400">$0.00</p>
-        </div>
-        <div class="sidebar-card text-center border-b-4 border-yellow-500/50">
-            <p class="text-slate-500 text-[10px] font-bold uppercase">Balance Anual</p>
-            <p id="gananciaAnio" class="text-2xl font-black text-yellow-500">$0.00</p>
-        </div>
+    <!-- DASHBOARD STATS -->
+    <div class="max-w-[1600px] mx-auto grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <div class="sidebar-card text-center border-b-4 border-slate-600"><p class="text-slate-500 text-[10px] font-bold uppercase">Ventas Hoy</p><p id="gananciaDia" class="text-2xl font-black">$0.00</p></div>
+        <div class="sidebar-card text-center border-b-4 border-red-500/50"><p class="text-slate-500 text-[10px] font-bold uppercase">Costos Hoy</p><p id="costoDia" class="text-2xl font-black text-red-500">$0.00</p></div>
+        <div class="sidebar-card text-center border-b-4 border-blue-500/50"><p class="text-slate-500 text-[10px] font-bold uppercase">Neto Hoy</p><p id="netoDia" class="text-2xl font-black text-blue-400">$0.00</p></div>
+        <div class="sidebar-card text-center border-b-4 border-emerald-500/50"><p class="text-slate-500 text-[10px] font-bold uppercase">Utilidad Mes</p><p id="gananciaMes" class="text-2xl font-black text-emerald-400">$0.00</p></div>
+        <div class="sidebar-card text-center border-b-4 border-yellow-500/50"><p class="text-slate-500 text-[10px] font-bold uppercase">Balance Anual</p><p id="gananciaAnio" class="text-2xl font-black text-yellow-500">$0.00</p></div>
     </div>
 
-    <div class="max-w-[1500px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        <div class="lg:col-span-3 space-y-4">
+        <!-- PANEL IZQUIERDO: REGISTRO -->
+        <div class="lg:col-span-3 space-y-6">
             <div class="sidebar-card">
-                <h3 class="text-blue-500 font-black italic mb-4 text-xs uppercase underline">Registro de Combos</h3>
-                <div class="space-y-3">
+                <h3 class="text-blue-500 font-black italic mb-6 text-sm uppercase flex items-center gap-2">
+                    <i class="fas fa-cart-plus"></i> Nueva Venta / Combo
+                </h3>
+                <div class="space-y-4">
                     <input id="nombre" type="text" placeholder="NOMBRE DEL CLIENTE" class="input-dark font-bold uppercase">
                     <input id="telefono" type="text" placeholder="WHATSAPP (Ej: 58412...)" class="input-dark">
                     
                     <div>
-                        <p class="text-[9px] font-bold text-slate-500 mb-2 uppercase italic">Selecciona Servicio:</p>
+                        <p class="text-[10px] font-black text-slate-500 mb-3 uppercase italic">Seleccionar Plataforma:</p>
                         <div class="grid-services" id="gridServicios"></div>
                     </div>
 
-                    <div class="bg-black/20 p-3 rounded-xl border border-slate-800 space-y-2">
-                        <div class="grid grid-cols-2 gap-2">
-                            <input id="costo" type="number" step="0.1" placeholder="Costo $" class="input-dark text-center">
-                            <input id="precio" type="number" step="0.1" placeholder="Venta $" class="input-dark text-center text-blue-400 font-bold">
+                    <div class="bg-black/30 p-4 rounded-2xl border border-slate-800 space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <input id="costo" type="number" step="0.01" placeholder="Costo $" class="input-dark text-center">
+                            <input id="precio" type="number" step="0.01" placeholder="Venta $" class="input-dark text-center text-blue-400 font-bold border-blue-900/30">
                         </div>
                         <input id="correo" type="text" placeholder="Correo / Usuario" class="input-dark">
                         <input id="clave" type="text" placeholder="Contraseña" class="input-dark">
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-2 gap-3">
                             <input id="perfil" type="text" placeholder="Perfil" class="input-dark">
                             <input id="pin" type="text" placeholder="PIN" class="input-dark">
                         </div>
-                        <button onclick="agregarAlCarrito()" class="w-full bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 font-bold py-2 rounded-lg text-[10px] uppercase border border-blue-500/30 transition-all">
+                        <button onclick="agregarAlCarrito()" class="w-full bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-black py-3 rounded-xl text-[10px] uppercase border border-blue-500/30 transition-all">
                             + Añadir al Carrito
                         </button>
                     </div>
 
-                    <div id="listaCarrito" class="space-y-1 max-h-32 overflow-y-auto bg-black/40 p-2 rounded-lg border border-dashed border-slate-700 text-[10px]">
+                    <div id="listaCarrito" class="space-y-2 max-h-40 overflow-y-auto bg-black/50 p-3 rounded-xl border border-dashed border-slate-700 text-[11px]">
                         <p class="text-center text-slate-600 italic">Carrito vacío</p>
                     </div>
 
-                    <div class="pt-2">
-                        <div class="flex justify-between font-black mb-3 text-xs">
-                            <span>TOTAL:</span>
-                            <span id="totalCarrito" class="text-emerald-400">$0.00</span>
+                    <div class="pt-4 border-t border-slate-800">
+                        <div class="flex justify-between font-black mb-4 text-sm">
+                            <span class="text-slate-400">TOTAL A COBRAR:</span>
+                            <span id="totalCarrito" class="text-emerald-400 text-lg">$0.00</span>
                         </div>
-                        <input id="vencimiento" type="date" class="input-dark font-bold mb-3">
-                        <button onclick="finalizarVenta()" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl uppercase text-xs shadow-lg shadow-blue-900/40 transition-all">
-                            Finalizar y Entregar
+                        <label class="text-[10px] font-bold text-slate-500 uppercase ml-1">Fecha de Vencimiento:</label>
+                        <input id="vencimiento" type="date" class="input-dark font-black mb-4 mt-1 border-emerald-900/30">
+                        <button onclick="finalizarVenta()" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl uppercase text-xs shadow-xl shadow-blue-900/40 transition-all">
+                            Finalizar Venta
                         </button>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- PANEL DERECHO: TABLA -->
         <div class="lg:col-span-9">
             <div class="sidebar-card overflow-hidden !p-0">
-                <div class="p-4 border-b border-slate-800 bg-white/5">
-                    <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="Buscar cliente o plataforma..." class="w-full bg-black/40 border border-slate-700 rounded-xl px-4 py-2 text-xs outline-none focus:border-blue-500">
+                <div class="p-5 border-b border-slate-800 bg-white/5 flex flex-col md:flex-row gap-4 justify-between items-center">
+                    <h2 class="font-black italic text-sm text-slate-400 uppercase tracking-widest">Base de Datos Planet Streaming</h2>
+                    <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="🔍 Buscar cliente, correo o servicio..." class="w-full md:w-80 bg-black/40 border border-slate-700 rounded-xl px-4 py-2 text-xs outline-none focus:border-blue-500">
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
-                        <thead class="text-[10px] text-slate-500 uppercase font-black bg-black/20">
+                        <thead class="text-[10px] text-slate-500 uppercase font-black bg-black/40">
                             <tr>
-                                <th class="p-4">Cliente / Servicio</th>
-                                <th class="p-4 text-center">Estado</th>
-                                <th class="p-4 text-center">Vence</th>
-                                <th class="p-4 text-center">Acciones</th>
-                                <th class="p-4"></th>
+                                <th class="p-5">Cliente / Plataforma</th>
+                                <th class="p-5 text-center">Estado</th>
+                                <th class="p-5 text-center">Vencimiento</th>
+                                <th class="p-5 text-center">Acciones</th>
+                                <th class="p-5"></th>
                             </tr>
                         </thead>
-                        <tbody id="cuerpoTabla" class="divide-y divide-slate-800/50 text-[11px] font-bold uppercase">
-                            </tbody>
+                        <tbody id="cuerpoTabla" class="divide-y divide-slate-800/40 text-[11px] font-bold uppercase">
+                        </tbody>
                     </table>
+                </div>
+                <div id="loader" class="p-20 text-center text-slate-600 font-black italic uppercase animate-pulse">
+                    Cargando base de datos...
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- CONFIGURACIÓN CENTRAL ---
+        // === CONFIGURACIÓN: PEGA TU URL DE GOOGLE AQUÍ ===
         const API_URL = "https://script.google.com/macros/s/AKfycbxRFID-dOQuNJcC2b74GmpYXJ9Do6w5U0yQy89IPy1Y805owu__Xce3yRI9eDBnVpjz/exec"; 
 
         let clientesGlobal = [];
@@ -158,15 +155,12 @@
                 correo: document.getElementById('correo').value.trim(),
                 clave: document.getElementById('clave').value.trim(),
                 perfil: document.getElementById('perfil').value.trim() || "ÚNICO",
-                pin: document.getElementById('pin').value.trim() || "NO"
+                pin: document.getElementById('pin').value.trim() || "N/A"
             };
-            if(!item.correo || !item.clave) return alert("Ingresa Correo y Clave");
+            if(!item.correo || !item.clave) return alert("⚠️ Correo y Clave son obligatorios.");
             carrito.push(item);
             actualizarVistaCarrito();
-            document.getElementById('correo').value = "";
-            document.getElementById('clave').value = "";
-            document.getElementById('perfil').value = "";
-            document.getElementById('pin').value = "";
+            ["correo", "clave", "perfil", "pin"].forEach(id => document.getElementById(id).value = "");
         }
 
         function actualizarVistaCarrito() {
@@ -180,11 +174,11 @@
             }
             cont.innerHTML = carrito.map((it, idx) => {
                 total += it.precio;
-                return `<div class="flex justify-between items-center bg-black/40 p-2 rounded mb-1 border-l-2 border-blue-500">
+                return `<div class="flex justify-between items-center bg-black/40 p-2 px-3 rounded-lg border-l-4 border-blue-600 animate-fadeIn">
                     <span>${it.servicio}</span>
-                    <div class="flex gap-2 items-center">
-                        <span class="text-blue-400">$${it.precio.toFixed(2)}</span>
-                        <button onclick="eliminarDelCarrito(${idx})" class="text-red-500"><i class="fas fa-times"></i></button>
+                    <div class="flex gap-3 items-center">
+                        <span class="text-blue-400 font-black">$${it.precio.toFixed(2)}</span>
+                        <button onclick="eliminarDelCarrito(${idx})" class="text-red-500 hover:text-red-300"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
             }).join('');
@@ -201,13 +195,19 @@
                 const r = await fetch(API_URL);
                 const d = await r.json();
                 clientesGlobal = Array.isArray(d) ? d : [];
+                document.getElementById('loader').classList.add('hidden');
                 renderizarTabla();
-            } catch(e) { console.error("Error al cargar:", e); }
+            } catch(e) { 
+                console.error("Error:", e); 
+                document.getElementById('loader').innerText = "❌ ERROR AL CARGAR DATOS";
+            }
         }
 
         function renderizarTabla() {
             const tabla = document.getElementById('cuerpoTabla');
             const buscar = document.getElementById('buscador').value.toLowerCase();
+            
+            // HOY normalizado
             const hoy = new Date(); 
             hoy.setHours(0, 0, 0, 0);
 
@@ -217,49 +217,82 @@
             clientesGlobal.forEach(c => {
                 const [id, nom, tel, serv, costoVal, ventaVal, vence, mail, pass, perf, pin] = c;
                 
-                // --- CORRECCIÓN NaN DÍAS PARA AAAA-MM-DD ---
-                let fTexto = vence ? vence.toString().split('T')[0].replace(/-/g, '/') : "";
-                const fVence = new Date(fTexto); 
+                // --- LÓGICA DE FECHA ANTI-NaN ---
+                let fVence;
+                if (vence) {
+                    // Limpieza: si viene como "2026-03-31T00:00:00.000Z" o similar
+                    let str = vence.toString().split('T')[0];
+                    let p = str.includes('-') ? str.split('-') : str.split('/');
+                    
+                    if (p.length === 3) {
+                        // Detectar si el año es el primero o el último (AAAA-MM-DD vs DD-MM-AAAA)
+                        if (p[0].length === 4) {
+                            fVence = new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
+                        } else {
+                            fVence = new Date(parseInt(p[2]), parseInt(p[1]) - 1, parseInt(p[0]));
+                        }
+                    } else {
+                        fVence = new Date(vence);
+                    }
+                } else {
+                    fVence = new Date(NaN);
+                }
                 fVence.setHours(0, 0, 0, 0);
 
                 const costo = parseFloat(costoVal) || 0;
                 const venta = parseFloat(ventaVal) || 0;
                 const fReg = new Date(parseInt(id));
 
+                // Estadísticas (Año 2026)
                 if(!isNaN(fReg.getTime())) {
                     if(fReg.toDateString() === hoy.toDateString()) { vDia += venta; cDia += costo; }
                     if(fReg.getMonth() === hoy.getMonth() && fReg.getFullYear() === 2026) uMes += (venta - costo);
                     if(fReg.getFullYear() === 2026) uAnio += (venta - costo);
                 }
 
-                if(nom.toString().toLowerCase().includes(buscar) || serv.toString().toLowerCase().includes(buscar)) {
-                    let diff = Math.ceil((fVence - hoy) / (1000 * 60 * 60 * 24));
-                    let stClase = "status-red", stTexto = "ERROR";
+                if(nom.toString().toLowerCase().includes(buscar) || serv.toString().toLowerCase().includes(buscar) || mail.toString().toLowerCase().includes(buscar)) {
+                    
+                    let diff = Math.ceil((fVence.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
+                    let stClase = "status-red", stTexto = "EXPIRADO";
 
                     if (!isNaN(diff)) {
                         stClase = diff < 0 ? "status-red" : (diff <= 3 ? "status-yellow" : "status-green");
                         stTexto = diff < 0 ? "VENCIDO" : (diff === 0 ? "HOY" : `${diff} DÍAS`);
                     }
 
-                    const msgAcceso = `⭐ *ACCESO ACTIVADO* ⭐%0A------------------------------%0A📺 *SERVICIO:* ${serv}%0A👤 *User:* ${mail}%0A🔑 *Pass:* ${pass}%0A👤 *Perfil:* ${perf}%0A📌 *PIN:* ${pin}%0A🗓️ *Vence:* ${vence}%0A------------------------------%0A🍿 Planet Streaming`;
-                    const msg3D = `Hola *${nom}* 🍿. Te saludamos de *Planet Streaming*. Solo recordarte que a tu servicio de *${serv}* le quedan *3 días* (${vence}). 😊`;
-                    const msg0D = `🚨 *AVISO DE CORTE* - *${nom}*%0A%0ATu servicio *${serv}* vence *HOY* (${vence}). Para evitar el corte de pantalla, por favor realiza el pago. 🍿`;
+                    // Formato fecha para mostrar (DD/MM/AAAA)
+                    let fechaShow = !isNaN(fVence.getTime()) ? fVence.toLocaleDateString('es-ES') : "S/F";
 
-                    html += `<tr>
-                        <td class="p-4"><p class="text-blue-400 font-black">${nom}</p><p class="text-[9px] text-slate-500 italic">${serv}</p></td>
-                        <td class="p-4 text-center"><span class="status-pill ${stClase}">${stTexto}</span></td>
-                        <td class="p-4 text-center font-mono text-slate-400 text-[10px]">${vence}</td>
-                        <td class="p-4 text-center space-x-1">
-                            <a href="https://api.whatsapp.com/send?phone=${tel}&text=${msgAcceso}" target="_blank" class="action-btn bg-blue-600"><i class="fas fa-key"></i></a>
-                            <a href="https://api.whatsapp.com/send?phone=${tel}&text=${msg3D}" target="_blank" class="action-btn bg-orange-500">3D</a>
-                            <a href="https://api.whatsapp.com/send?phone=${tel}&text=${msg0D}" target="_blank" class="action-btn bg-red-600">0D</a>
-                            <button onclick="renovar('${id}')" class="action-btn bg-emerald-600"><i class="fas fa-sync-alt"></i></button>
+                    const msgAcceso = `⭐ *ACCESO ACTIVADO* ⭐%0A------------------------------%0A📺 *SERVICIO:* ${serv}%0A👤 *User:* ${mail}%0A🔑 *Pass:* ${pass}%0A👤 *Perfil:* ${perf}%0A📌 *PIN:* ${pin}%0A🗓️ *Vence:* ${fechaShow}%0A------------------------------%0A🍿 Planet Streaming`;
+                    const msg3D = `Hola *${nom}* 🍿. Te recordamos que a tu servicio *${serv}* le quedan *3 días* de vigencia (${fechaShow}). 😊`;
+                    const msg0D = `🚨 *AVISO DE CORTE* - *${nom}*%0A%0ATu servicio *${serv}* vence *HOY* (${fechaShow}). Para evitar interrupciones, por favor realiza el pago. 🍿`;
+
+                    html += `
+                    <tr class="hover:bg-white/5 transition-all">
+                        <td class="p-5">
+                            <p class="text-blue-400 font-black text-sm">${nom}</p>
+                            <p class="text-[9px] text-slate-500 italic mt-1">${serv} • ${mail}</p>
                         </td>
-                        <td class="p-4"><button onclick="eliminar('${id}')" class="text-slate-600 hover:text-red-500 px-2">×</button></td>
+                        <td class="p-5 text-center"><span class="status-pill ${stClase}">${stTexto}</span></td>
+                        <td class="p-5 text-center font-mono text-slate-400 text-[10px]">${fechaShow}</td>
+                        <td class="p-5 text-center">
+                            <div class="flex justify-center gap-2">
+                                <a href="https://api.whatsapp.com/send?phone=${tel}&text=${msgAcceso}" target="_blank" class="action-btn bg-blue-600" title="Credenciales"><i class="fas fa-key text-xs"></i></a>
+                                <a href="https://api.whatsapp.com/send?phone=${tel}&text=${msg3D}" target="_blank" class="action-btn bg-orange-500">3D</a>
+                                <a href="https://api.whatsapp.com/send?phone=${tel}&text=${msg0D}" target="_blank" class="action-btn bg-red-600">0D</a>
+                                <button onclick="renovar('${id}')" class="action-btn bg-emerald-600"><i class="fas fa-sync-alt"></i></button>
+                            </div>
+                        </td>
+                        <td class="p-5">
+                            <button onclick="eliminar('${id}')" class="text-slate-600 hover:text-red-500 transition-colors px-2">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </td>
                     </tr>`;
                 }
             });
-            tabla.innerHTML = html;
+            tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center text-slate-600 italic">No se encontraron resultados</td></tr>';
+            
             document.getElementById('gananciaDia').innerText = `$${vDia.toFixed(2)}`;
             document.getElementById('costoDia').innerText = `$${cDia.toFixed(2)}`;
             document.getElementById('netoDia').innerText = `$${(vDia - cDia).toFixed(2)}`;
@@ -268,31 +301,47 @@
         }
 
         async function finalizarVenta() {
-            const nom = document.getElementById('nombre').value.toUpperCase();
-            const tel = document.getElementById('telefono').value;
+            const nom = document.getElementById('nombre').value.toUpperCase().trim();
+            const tel = document.getElementById('telefono').value.trim();
             const vence = document.getElementById('vencimiento').value;
             const btn = document.getElementById('btnGuardar');
-            if(!nom || !vence || carrito.length === 0) return alert("Faltan datos");
+            
+            if(!nom || !vence || carrito.length === 0) return alert("⚠️ Completa: Nombre, Fecha y al menos 1 servicio.");
 
-            btn.disabled = true; btn.innerText = "PROCESANDO...";
+            btn.disabled = true; 
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> REGISTRANDO...';
 
             for (let i = 0; i < carrito.length; i++) {
                 const it = carrito[i];
-                const data = { id: Date.now() + i, nombre: nom, telefono: tel, servicio: it.servicio, costo: it.costo, precio: it.precio, vencimiento: vence, correo: it.correo, clave: it.clave, perfil: it.perfil, pin: it.pin };
-                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+                const data = { 
+                    id: Date.now() + i, 
+                    nombre: nom, 
+                    telefono: tel, 
+                    servicio: it.servicio, 
+                    costo: it.costo, 
+                    precio: it.precio, 
+                    vencimiento: vence, 
+                    correo: it.correo, 
+                    clave: it.clave, 
+                    perfil: it.perfil, 
+                    pin: it.pin 
+                };
+                try {
+                    await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+                } catch(e) { console.error("Error envío:", e); }
             }
-            alert("Venta registrada con éxito");
+            alert("✅ Venta registrada correctamente en Planet Streaming.");
             location.reload();
         }
 
         async function renovar(id) {
-            if(!confirm("¿Renovar 30 días adicionales?")) return;
+            if(!confirm("¿Deseas renovar este servicio por 30 días adicionales?")) return;
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'RENEW', id: id }) });
             location.reload();
         }
 
         async function eliminar(id) {
-            if(!confirm("¿Eliminar este registro permanentemente?")) return;
+            if(!confirm("¿Estás seguro de eliminar este registro permanentemente?")) return;
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', id: id }) });
             location.reload();
         }
