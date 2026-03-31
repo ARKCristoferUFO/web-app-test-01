@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planet Streaming | Panel Cristopher</title>
+    <title>Planet Streaming | Panel Administrativo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -14,7 +14,7 @@
         .input-dark:focus { border-color: var(--blue); }
         .btn-service { background: #1e293b; border: 1px solid #334155; border-radius: 0.5rem; padding: 0.5rem; font-size: 10px; color: #94a3b8; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
         .btn-service.active { background: var(--blue); color: white; border-color: #60a5fa; box-shadow: 0 0 10px rgba(37, 99, 235, 0.4); }
-        .status-pill { border-radius: 20px; padding: 3px 8px; font-weight: 800; font-size: 10px; border: 1px solid; text-align: center; display: inline-block; min-width: 70px; }
+        .status-pill { border-radius: 20px; padding: 3px 8px; font-weight: 800; font-size: 10px; border: 1px solid; text-align: center; display: inline-block; min-width: 85px; }
         .status-green { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: #10b981; }
         .status-yellow { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-color: #f59e0b; }
         .status-red { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: #ef4444; }
@@ -25,13 +25,12 @@
 
     <div class="max-w-[1500px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5">
         
-        <!-- COLUMNA IZQUIERDA: FORMULARIO -->
         <div class="lg:col-span-3 space-y-4">
             <div class="sidebar-card">
                 <h3 class="text-blue-400 font-black mb-4 text-xs uppercase tracking-tighter">Nueva Venta</h3>
                 <div class="space-y-3">
                     <input id="nombre" type="text" placeholder="CLIENTE" class="input-dark font-bold uppercase">
-                    <input id="telefono" type="text" placeholder="WHATSAPP (ej: 58412...)" class="input-dark">
+                    <input id="telefono" type="text" placeholder="WHATSAPP" class="input-dark">
                     
                     <div class="bg-black/20 p-2 rounded-lg border border-slate-800">
                         <div class="grid grid-cols-3 gap-1" id="gridServicios"></div>
@@ -50,21 +49,21 @@
                         <input id="pin" type="text" placeholder="PIN" class="input-dark">
                     </div>
 
+                    <label class="text-[10px] text-slate-500 font-bold ml-1 uppercase">Fecha de Vencimiento:</label>
                     <input id="vencimiento" type="date" class="input-dark font-bold text-emerald-400">
                     
-                    <button onclick="enviarVenta()" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-3 rounded-lg uppercase text-xs transition-all">
+                    <button onclick="enviarVenta()" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-3 rounded-lg uppercase text-xs">
                         Registrar Venta
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- COLUMNA DERECHA: TABLA -->
         <div class="lg:col-span-9">
             <div class="sidebar-card !p-0 overflow-hidden">
                 <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-white/5">
-                    <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="Buscar cliente o servicio..." class="w-full max-w-sm bg-black/40 border border-slate-700 rounded-md px-3 py-1.5 text-xs outline-none focus:border-blue-500">
-                    <div class="text-[10px] font-bold text-slate-500 ml-4">PLANET STREAMING v3.6</div>
+                    <input id="buscador" onkeyup="renderizarTabla()" type="text" placeholder="Buscar cliente o servicio..." class="w-full max-w-sm bg-black/40 border border-slate-700 rounded-md px-3 py-1.5 text-xs outline-none">
+                    <div class="text-[10px] font-bold text-slate-500 ml-4">PLANET STREAMING v4.0</div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full">
@@ -76,9 +75,7 @@
                                 <th class="p-3 text-center">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody id="cuerpoTabla" class="divide-y divide-slate-800/50 text-[11px] uppercase">
-                            <!-- Datos aquí -->
-                        </tbody>
+                        <tbody id="cuerpoTabla" class="divide-y divide-slate-800/50 text-[11px] uppercase"></tbody>
                     </table>
                 </div>
                 <div id="loader" class="p-10 text-center text-slate-500 italic animate-pulse">Cargando base de datos...</div>
@@ -87,7 +84,7 @@
     </div>
 
     <script>
-        // PEGA TU URL AQUÍ
+        // URL DE TU IMPLEMENTACIÓN
         const API_URL = "https://script.google.com/macros/s/AKfycbxRFID-dOQuNJcC2b74GmpYXJ9Do6w5U0yQy89IPy1Y805owu__Xce3yRI9eDBnVpjz/exec"; 
 
         let clientesGlobal = [];
@@ -126,19 +123,28 @@
             let html = "";
 
             clientesGlobal.forEach(c => {
-                const [id, nom, tel, serv, costo, precio, vence, mail, pass, perf, pin] = c;
+                // MAPEO SEGÚN TU EXCEL: ID(0), Nom(1), Tel(2), Serv(3), Cost(4), Prec(5), Mail(6), Pass(7), Perf(8), Pin(9), Vence(10)
+                const [id, nom, tel, serv, costo, precio, mail, pass, perf, pin, vence] = c;
                 if(!nom) return;
 
                 if(nom.toString().toLowerCase().includes(buscar) || serv.toString().toLowerCase().includes(buscar)) {
                     let fVence = new Date(vence);
                     fVence.setHours(0,0,0,0);
                     
-                    let diff = Math.ceil((fVence.getTime() - hoy.getTime()) / (86400000));
-                    let stClase = diff < 0 ? "status-red" : (diff <= 3 ? "status-yellow" : "status-green");
-                    let stTexto = diff < 0 ? "CORTE" : (diff === 0 ? "HOY" : `${diff} DÍAS`);
+                    let stClase = "";
+                    let stTexto = "";
+
+                    if(isNaN(fVence.getTime())) {
+                        stClase = "status-red";
+                        stTexto = "ERROR FECHA";
+                    } else {
+                        let diff = Math.ceil((fVence.getTime() - hoy.getTime()) / (86400000));
+                        stClase = diff < 0 ? "status-red" : (diff <= 3 ? "status-yellow" : "status-green");
+                        stTexto = diff < 0 ? `VENCIDO (${Math.abs(diff)}d)` : (diff === 0 ? "HOY" : `${diff} DÍAS`);
+                    }
 
                     const wa = (msg) => `https://api.whatsapp.com/send?phone=${tel}&text=${encodeURIComponent(msg)}`;
-                    const msgAcceso = `⭐ *PLANET STREAMING* ⭐\n\n📺 *${serv}*\n👤 *User:* ${mail}\n🔑 *Pass:* ${pass}\n👤 *Perfil:* ${perf}\n📌 *PIN:* ${pin}\n🗓️ *Vence:* ${fVence.toLocaleDateString()}`;
+                    const msgAcceso = `⭐ *PLANET STREAMING* ⭐\n\n📺 *${serv}*\n👤 *User:* ${mail}\n🔑 *Pass:* ${pass}\n👤 *Perfil:* ${perf}\n📌 *PIN:* ${pin}\n🗓️ *Vence:* ${isNaN(fVence.getTime()) ? '---' : fVence.toLocaleDateString()}`;
 
                     html += `
                     <tr class="hover:bg-white/5 transition-all">
@@ -147,7 +153,7 @@
                             <div class="text-[9px] text-slate-500">${serv}</div>
                         </td>
                         <td class="p-3 text-center"><span class="status-pill ${stClase}">${stTexto}</span></td>
-                        <td class="p-3 text-center font-mono text-slate-400">${fVence.toLocaleDateString()}</td>
+                        <td class="p-3 text-center font-mono text-slate-400">${isNaN(fVence.getTime()) ? '---' : fVence.toLocaleDateString()}</td>
                         <td class="p-3 text-center">
                             <div class="flex justify-center gap-1">
                                 <a href="${wa(msgAcceso)}" target="_blank" class="action-btn bg-blue-600" title="Enviar Acceso"><i class="fas fa-key"></i></a>
@@ -170,33 +176,31 @@
                 servicio: servicioActivo,
                 costo: document.getElementById('costo').value || 0,
                 precio: document.getElementById('precio').value || 0,
-                vencimiento: document.getElementById('vencimiento').value,
                 correo: document.getElementById('correo').value,
                 clave: document.getElementById('clave').value,
                 perfil: document.getElementById('perfil').value || "UNICO",
-                pin: document.getElementById('pin').value || "N/A"
+                pin: document.getElementById('pin').value || "N/A",
+                vencimiento: document.getElementById('vencimiento').value
             };
 
             if(!data.nombre || !data.vencimiento) return alert("Nombre y Fecha son obligatorios");
 
             btn.disabled = true;
             btn.innerText = "Guardando...";
-
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-            
             setTimeout(() => { location.reload(); }, 1500);
         }
 
         async function renovar(id) {
-            if(!confirm("¿Renovar 30 días?")) return;
+            if(!confirm("¿Renovar 30 días adicionales?")) return;
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'RENEW', id: id }) });
-            location.reload();
+            setTimeout(() => { location.reload(); }, 1000);
         }
 
         async function eliminar(id) {
-            if(!confirm("¿Eliminar registro?")) return;
+            if(!confirm("¿Deseas eliminar este cliente permanentemente?")) return;
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', id: id }) });
-            location.reload();
+            setTimeout(() => { location.reload(); }, 1000);
         }
     </script>
 </body>
