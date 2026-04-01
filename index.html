@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planet Streaming | Panel Oficial</title>
+    <title>Planet Streaming | Panel Corregido</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -26,7 +26,7 @@
     <div class="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div class="lg:col-span-4">
             <div class="sidebar-card shadow-xl">
-                <h2 class="text-blue-400 font-black text-xs mb-5 uppercase tracking-widest">Ventas Planet Streaming</h2>
+                <h2 class="text-blue-400 font-black text-xs mb-5 uppercase tracking-widest">Planet Streaming</h2>
                 <div class="space-y-4">
                     <div class="grid grid-cols-2 gap-2">
                         <input id="c_nombre" type="text" placeholder="CLIENTE" class="input-dark font-bold uppercase">
@@ -46,32 +46,32 @@
 
         <div class="lg:col-span-8">
             <div class="sidebar-card !p-0 overflow-hidden shadow-2xl">
-                <div class="p-4 bg-white/5 border-b border-slate-800">
-                    <input id="bus" onkeyup="renderTabla()" type="text" placeholder="Buscar cliente o servicio..." class="bg-black/40 border border-slate-700 rounded-lg px-4 py-2 text-xs w-full outline-none focus:border-blue-500">
+                <div class="p-4 bg-white/5 border-b border-slate-800 flex justify-between items-center">
+                    <input id="bus" onkeyup="renderTabla()" type="text" placeholder="Buscar por cliente o servicio..." class="bg-black/40 border border-slate-700 rounded-lg px-4 py-2 text-xs w-full outline-none focus:border-blue-500">
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead class="bg-black/40 text-[10px] uppercase text-slate-500 border-b border-slate-800">
                             <tr>
                                 <th class="p-4">Cliente / Combo</th>
-                                <th class="p-4 text-center">Días</th>
-                                <th class="p-4 text-center">Acciones WhatsApp</th>
+                                <th class="p-4 text-center">Estado / Días</th>
+                                <th class="p-4 text-center">WhatsApp</th>
                                 <th class="p-4 text-center">Gestión</th>
                             </tr>
                         </thead>
                         <tbody id="cuerpoTabla" class="divide-y divide-slate-800/50 uppercase"></tbody>
                     </table>
                 </div>
-                <div id="loader" class="p-10 text-center text-slate-500 font-bold italic animate-pulse">Conectando con Google Sheets...</div>
+                <div id="loader" class="p-10 text-center text-slate-500 font-bold italic animate-pulse">Cargando base de datos...</div>
             </div>
         </div>
     </div>
 
     <script>
-        // URL YA CONFIGURADA
         const API_URL = "https://script.google.com/macros/s/AKfycbxRFID-dOQuNJcC2b74GmpYXJ9Do6w5U0yQy89IPy1Y805owu__Xce3yRI9eDBnVpjz/exec";
         
-        const APPS = ["NETFLIX", "MAX", "PRIME", "DISNEY+", "IPTV", "YOUTUBE", "SPOTIFY", "CANVA", "CAPCUT", "TELELATINO", "PARAMOUNT"];
+        // Plataformas actualizadas según tu negocio
+        const APPS = ["NETFLIX", "MAX", "PRIME", "DISNEY+", "IPTV", "YOUTUBE", "SPOTIFY", "CANVA", "CAPCUT", "TELELATINO", "PARAMOUNT", "CRUNCHYROLL", "VIX"];
         let seleccionadas = new Set();
         let datosGlobal = [];
 
@@ -148,7 +148,10 @@
             let html = "";
 
             datosGlobal.forEach(c => {
+                // MAPEO EXACTO SEGÚN TU IMAGEN: 
+                // A=id, B=nombre, C=tel, D=serv, E=costo, F=precio, G=mail, H=pass, I=perf, J=pin, K=vence
                 const [id, nom, tel, serv, , , mail, pass, perf, pin, vence] = c;
+                
                 if(!nom || (!nom.toLowerCase().includes(busq) && !serv.toLowerCase().includes(busq))) return;
 
                 let fVence = new Date(vence);
@@ -156,7 +159,6 @@
                 let stClase = diff > 3 ? "status-green" : (diff >= 0 ? "status-yellow" : "status-red");
                 let stTexto = diff > 0 ? `${diff} DÍAS` : (diff === 0 ? "VENCE HOY" : "VENCIDO");
 
-                // Lógica de Mensajes WhatsApp
                 let msgEntrega = `⭐ *PLANET STREAMING* ⭐\n\nHola *${nom}*, tus accesos:\n\n`;
                 const s_list = (serv || "").toString().split(' + ');
                 const m_list = (mail || "").toString().split(' | ');
@@ -171,10 +173,6 @@
                 });
                 msgEntrega += `🗓️ *Vence:* ${fVence.toLocaleDateString('es-ES')}`;
 
-                let msg3dias = `⚠️ *RECORDATORIO* - Hola *${nom}*, tu combo de *${serv}* vence en *3 días*. ¡Renueva con tiempo!`;
-                let msgHoy = `🚨 *VENCE HOY* - Hola *${nom}*, tu combo de *${serv}* vence hoy. Evita el corte enviando tu pago ahora.`;
-                let msgVencido = `🚫 *CORTE DE SERVICIO* - Hola *${nom}*, tu servicio de *${serv}* ha vencido. Reactiva enviando tu comprobante.`;
-
                 html += `
                 <tr class="hover:bg-white/5 transition-all text-[11px]">
                     <td class="p-4">
@@ -184,35 +182,20 @@
                     <td class="p-4 text-center"><span class="status-pill ${stClase}">${stTexto}</span></td>
                     <td class="p-4 text-center">
                         <div class="flex justify-center gap-1.5">
-                            <a href="https://api.whatsapp.com/send?phone=${tel}&text=${encodeURIComponent(msgEntrega)}" target="_blank" class="action-btn bg-blue-600" title="Entregar"><i class="fas fa-key"></i></a>
-                            <a href="https://api.whatsapp.com/send?phone=${tel}&text=${encodeURIComponent(msg3dias)}" target="_blank" class="action-btn bg-orange-500" title="3 Días"><i class="fas fa-bell"></i></a>
-                            <a href="https://api.whatsapp.com/send?phone=${tel}&text=${encodeURIComponent(msgHoy)}" target="_blank" class="action-btn bg-yellow-500 text-black" title="Vence Hoy"><i class="fas fa-clock"></i></a>
-                            <a href="https://api.whatsapp.com/send?phone=${tel}&text=${encodeURIComponent(msgVencido)}" target="_blank" class="action-btn bg-red-600" title="Vencido"><i class="fas fa-times-circle"></i></a>
+                            <a href="https://api.whatsapp.com/send?phone=${tel}&text=${encodeURIComponent(msgEntrega)}" target="_blank" class="action-btn bg-blue-600"><i class="fas fa-key"></i></a>
+                            <a href="https://api.whatsapp.com/send?phone=${tel}&text=${encodeURIComponent('⚠️ Hola '+nom+', recordatorio de pago para '+serv)}" target="_blank" class="action-btn bg-orange-500"><i class="fas fa-bell"></i></a>
                         </div>
                     </td>
                     <td class="p-4 text-center">
-                        <div class="flex justify-center gap-1.5">
-                            <button id="btn-ren-${id}" onclick="renovar('${id}')" class="action-btn bg-emerald-600" title="Renovar +30"><i class="fas fa-sync"></i></button>
-                            <button onclick="eliminar('${id}')" class="action-btn bg-slate-700 text-red-400 border border-red-900/30"><i class="fas fa-trash-alt"></i></button>
-                        </div>
+                        <button onclick="eliminar('${id}')" class="action-btn bg-slate-700 text-red-400 border border-red-900/30"><i class="fas fa-trash-alt"></i></button>
                     </td>
                 </tr>`;
             });
             tbody.innerHTML = html;
         }
 
-        async function renovar(id) {
-            if(!confirm("¿Renovar este combo por 30 días?")) return;
-            const btn = document.getElementById(`btn-ren-${id}`);
-            btn.innerHTML = "..."; btn.disabled = true;
-            try {
-                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'RENEW', id: id }) });
-                setTimeout(() => location.reload(), 1000);
-            } catch(e) { alert("Error al renovar"); btn.innerHTML = '<i class="fas fa-sync"></i>'; btn.disabled = false; }
-        }
-
         async function eliminar(id) {
-            if(!confirm("¿Eliminar definitivamente?")) return;
+            if(!confirm("¿Borrar cliente?")) return;
             await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', id: id }) });
             setTimeout(() => location.reload(), 1000);
         }
