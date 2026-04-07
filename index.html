@@ -166,13 +166,21 @@
             });
         }
 
+        // --- FUNCIÓN GUARDAR CORREGIDA ---
         async function guardarEnGoogle() {
             const btn = document.getElementById('btnGuardar');
             const nom = document.getElementById('nombre').value.toUpperCase().trim();
             const tel = document.getElementById('telefono').value.trim();
             const blocks = document.querySelectorAll('.data-block');
-            if (!nom || !tel || blocks.length === 0) return alert("Rellena nombre, whatsapp y servicio.");
-            btn.innerText = "PROCESANDO..."; btn.disabled = true;
+            
+            // Verificación estricta de campos
+            if (!nom || !tel || blocks.length === 0) {
+                return alert("⚠️ Debes completar:\n- Nombre del Cliente\n- WhatsApp\n- Seleccionar al menos 1 servicio");
+            }
+
+            btn.innerText = "PROCESANDO..."; 
+            btn.disabled = true;
+
             let c=[], k=[], p=[], n=[], s=[];
             blocks.forEach(b => {
                 s.push(b.dataset.plataforma);
@@ -181,17 +189,33 @@
                 p.push(b.querySelector('.val-perfil').value.trim() || '---');
                 n.push(b.querySelector('.val-pin').value.trim() || '---');
             });
+
             const payload = {
-                id: Date.now(), nombre: nom, telefono: tel,
-                servicio: s.join(" + "), costo: Number(document.getElementById('costo').value),
-                precio: Number(document.getElementById('precio').value), correo: c.join(" , "),
-                clave: k.join(" , "), perfil: p.join(" , "), pin: n.join(" , "),
+                id: Date.now(), 
+                nombre: nom, 
+                telefono: tel,
+                servicio: s.join(" + "), 
+                costo: Number(document.getElementById('costo').value) || 0,
+                precio: Number(document.getElementById('precio').value) || 0, 
+                correo: c.join(" , "),
+                clave: k.join(" , "), 
+                perfil: p.join(" , "), 
+                pin: n.join(" , "),
                 vencimiento: document.getElementById('vencimiento').value
             };
+
             try {
-                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                await fetch(API_URL, { 
+                    method: 'POST', 
+                    mode: 'no-cors', 
+                    body: JSON.stringify(payload) 
+                });
+                alert("✅ Registrado con éxito en Planet Streaming");
                 location.reload();
-            } catch (e) { btn.disabled = false; btn.innerText = "ERROR"; }
+            } catch (e) { 
+                btn.disabled = false; 
+                btn.innerText = "ERROR - REINTENTAR"; 
+            }
         }
 
         async function cargarDatos() {
@@ -250,6 +274,7 @@
             document.getElementById('gananciaAnio').innerText = uA.toFixed(2);
         }
 
+        // --- FORMATO HAROLD CORREGIDO ---
         function enviarMensaje(id, tipo) {
             const cliente = clientesGlobal.find(x => x[0].toString() === id.toString());
             if (!cliente) return;
