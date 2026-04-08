@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planet Streaming - Admin Pro</title>
+    <title>Planet Streaming - Panel Oficial</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; }
-        .btn-plataforma.active { background: #2563eb !important; color: white !important; border-color: #60a5fa; }
+        .btn-plataforma.active { background: #2563eb !important; color: white !important; border-color: #60a5fa; box-shadow: 0 0 15px rgba(37, 99, 235, 0.3); }
         .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
         .status-green { color: #10b981; border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
         .status-yellow { color: #fbbf24; border-color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
@@ -30,17 +30,23 @@
     <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div class="lg:col-span-4 space-y-6">
             <div class="bg-slate-900/50 p-6 rounded-3xl border border-slate-800 shadow-2xl">
-                <h3 class="text-blue-500 font-black text-sm uppercase mb-6 flex items-center gap-2">Nuevo Registro</h3>
+                <h3 class="text-blue-500 font-black text-sm uppercase mb-6">Nuevo Registro</h3>
                 <div class="space-y-4">
                     <input type="text" id="nombreCliente" placeholder="NOMBRE DEL CLIENTE" class="w-full bg-slate-950 p-4 rounded-xl border border-slate-800 outline-none text-white text-xs font-bold uppercase">
-                    <input type="text" id="telefonoCliente" placeholder="WHATSAPP" class="w-full bg-slate-950 p-4 rounded-xl border border-slate-800 outline-none text-white text-xs">
+                    <input type="text" id="telefonoCliente" placeholder="WHATSAPP (Ej: 58412...)" class="w-full bg-slate-950 p-4 rounded-xl border border-slate-800 outline-none text-white text-xs">
                     
                     <div id="gridPlataformas" class="grid grid-cols-3 gap-2 max-h-40 overflow-y-auto"></div>
                     <div id="contenedorDatosDinamicos" class="space-y-3"></div>
 
-                    <div class="grid grid-cols-2 gap-4 text-center">
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><p class="text-[9px] text-slate-500 font-bold uppercase">Costo</p><input type="number" id="costoServicio" class="bg-transparent w-full text-center outline-none font-bold" value="0.00"></div>
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800"><p class="text-[9px] text-blue-500 font-bold uppercase">Venta</p><input type="number" id="precioVenta" class="bg-transparent w-full text-center outline-none font-bold text-blue-400" value="0.00"></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
+                            <p class="text-[9px] text-slate-500 font-bold uppercase">Costo</p>
+                            <input type="number" id="costoServicio" step="0.01" class="bg-transparent w-full text-center outline-none font-bold" value="0.00">
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
+                            <p class="text-[9px] text-blue-500 font-bold uppercase">Venta</p>
+                            <input type="number" id="precioVenta" step="0.01" class="bg-transparent w-full text-center outline-none font-bold text-blue-400" value="0.00">
+                        </div>
                     </div>
                     
                     <input type="date" id="fechaVencimiento" class="w-full bg-slate-950 p-4 rounded-xl border border-slate-800 text-white text-xs font-bold">
@@ -52,7 +58,7 @@
         <div class="lg:col-span-8">
             <div class="bg-slate-900/50 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl">
                 <div class="p-4 border-b border-slate-800">
-                    <input type="text" id="buscador" oninput="renderizarTabla()" placeholder="Buscar cliente o servicio..." class="w-full bg-slate-950 p-3 rounded-xl border border-slate-800 outline-none text-xs text-white">
+                    <input type="text" id="buscador" oninput="renderizarTabla()" placeholder="Buscar por nombre o servicio..." class="w-full bg-slate-950 p-3 rounded-xl border border-slate-800 outline-none text-xs text-white">
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
@@ -61,14 +67,14 @@
                                 <th class="p-4">Cliente / Servicio</th>
                                 <th class="p-4 text-center">Estado</th>
                                 <th class="p-4 text-center">Vence</th>
-                                <th class="p-4 text-center">Gestión</th>
+                                <th class="p-4 text-center">Gestión Cobro</th>
                                 <th class="p-4"></th>
                             </tr>
                         </thead>
                         <tbody id="cuerpoTabla" class="text-[11px] divide-y divide-slate-800/30"></tbody>
                     </table>
                 </div>
-                <div id="loader" class="p-10 text-center text-slate-600 animate-pulse font-bold uppercase text-[10px]">Cargando Base_Streaming...</div>
+                <div id="loader" class="p-10 text-center text-slate-600 animate-pulse font-bold uppercase text-[10px]">Cargando Base de Datos...</div>
             </div>
         </div>
     </div>
@@ -78,25 +84,16 @@
         let clientesGlobal = [];
         const listaPlat = ["NETFLIX PERFIL", "NETFLIX PERSONAL", "DISNEY+", "MAX", "PRIME VIDEO", "PARAMOUNT+", "IPTV", "FLUJO TV", "TELELATINO", "VIX", "YOUTUBE", "SPOTIFY", "CRUNCHYROLL", "VIKI RAKUTEN", "CANVA PRO"];
 
-        // --- SOLUCIÓN DEFINITIVA PARA LA FECHA ---
-        function obtenerFechaLimpia(valor) {
-            if (!valor) return new Date();
-            
-            // Si ya es un objeto Date de Google, lo usamos
-            let d = new Date(valor);
-            if (!isNaN(d.getTime())) return d;
-
-            // Si es texto, limpiamos y parseamos manualmente
-            let s = valor.toString().split("T")[0]; // Quitar horas si las hay
-            let partes = s.includes("-") ? s.split("-") : s.split("/");
-            
-            if (partes.length === 3) {
-                // Si el primer bloque es el año (YYYY-MM-DD)
-                if (partes[0].length === 4) return new Date(partes[0], partes[1] - 1, partes[2]);
-                // Si el último bloque es el año (DD/MM/YYYY)
-                if (partes[2].length === 4) return new Date(partes[2], partes[1] - 1, partes[0]);
+        // --- PROCESAMIENTO DE TU FORMATO 2026-05-22 ---
+        function procesarFecha(v) {
+            if (!v) return new Date();
+            let s = v.toString().split("T")[0].trim();
+            let p = s.split("-");
+            if (p.length === 3) {
+                // Forzamos creación local (año, mes-1, día) para evitar desfases de zona horaria
+                return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
             }
-            return new Date(); // Fallback
+            return new Date(v);
         }
 
         function initGrid() {
@@ -104,28 +101,28 @@
             listaPlat.forEach(p => {
                 const btn = document.createElement('button');
                 btn.innerText = p;
-                btn.className = "btn-plataforma p-2 rounded-lg text-[8px] font-bold bg-slate-800 text-slate-400 border border-slate-700";
-                btn.onclick = () => { btn.classList.toggle('active'); actualizarInputsDinamicos(); };
+                btn.className = "btn-plataforma p-2 rounded-lg text-[8px] font-bold bg-slate-800 text-slate-400 border border-slate-700 transition-all";
+                btn.onclick = () => { btn.classList.toggle('active'); actInputs(); };
                 grid.appendChild(btn);
             });
         }
 
-        function actualizarInputsDinamicos() {
-            const contenedor = document.getElementById('contenedorDatosDinamicos');
-            const activos = document.querySelectorAll('.btn-plataforma.active');
-            contenedor.innerHTML = '';
-            activos.forEach(btn => {
+        function actInputs() {
+            const cont = document.getElementById('contenedorDatosDinamicos');
+            const act = document.querySelectorAll('.btn-plataforma.active');
+            cont.innerHTML = '';
+            act.forEach(b => {
                 const div = document.createElement('div');
                 div.className = "bg-slate-950 p-4 rounded-xl border border-blue-900/30 bloque-servicio";
-                div.dataset.name = btn.innerText;
-                div.innerHTML = `<p class="text-blue-500 font-black text-[9px] mb-2 uppercase">${btn.innerText}</p>
+                div.dataset.name = b.innerText;
+                div.innerHTML = `<p class="text-blue-500 font-black text-[9px] mb-2 uppercase">${b.innerText}</p>
                     <input type="text" placeholder="Correo" class="val-u w-full bg-transparent border-b border-slate-800 mb-2 outline-none text-[11px]">
                     <input type="text" placeholder="Clave" class="val-p w-full bg-transparent border-b border-slate-800 mb-2 outline-none text-[11px]">
                     <div class="grid grid-cols-2 gap-2">
                         <input type="text" placeholder="Perfil" class="val-perf bg-slate-900 p-1 rounded text-[10px]">
                         <input type="text" placeholder="PIN" class="val-pin bg-slate-900 p-1 rounded text-[10px]">
                     </div>`;
-                contenedor.appendChild(div);
+                cont.appendChild(div);
             });
         }
 
@@ -134,9 +131,8 @@
             const nom = document.getElementById('nombreCliente').value.trim();
             const tel = document.getElementById('telefonoCliente').value.trim();
             const bloques = document.querySelectorAll('.bloque-servicio');
-            if (!nom || !tel || bloques.length === 0) { alert("⚠️ Faltan datos."); return; }
-            
-            btn.innerText = "GUARDANDO..."; btn.disabled = true;
+            if (!nom || !tel || bloques.length === 0) { alert("⚠️ Completa los campos."); return; }
+            btn.innerText = "PROCESANDO..."; btn.disabled = true;
             let s=[], u=[], k=[], p=[], n=[];
             bloques.forEach(b => {
                 s.push(b.dataset.name);
@@ -145,7 +141,6 @@
                 p.push(b.querySelector('.val-perf').value || '---');
                 n.push(b.querySelector('.val-pin').value || '---');
             });
-
             const data = {
                 id: Date.now(), nombre: nom.toUpperCase(), telefono: tel,
                 servicio: s.join(" + "), costo: document.getElementById('costoServicio').value,
@@ -153,20 +148,19 @@
                 clave: k.join(" , "), perfil: p.join(" , "), pin: n.join(" , "),
                 vencimiento: document.getElementById('fechaVencimiento').value
             };
-
             try {
                 await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-                alert("✅ Registrado en Planet Streaming"); location.reload();
+                alert("✅ Guardado"); location.reload();
             } catch (e) { btn.innerText = "ERROR"; btn.disabled = false; }
         }
 
-        async function cargarDatos() {
+        async function cargar() {
             try {
                 const r = await fetch(API_URL);
                 clientesGlobal = await r.json();
                 document.getElementById('loader').style.display = 'none';
                 renderizarTabla();
-            } catch (e) { document.getElementById('loader').innerText = "Error al conectar."; }
+            } catch (e) { document.getElementById('loader').innerText = "Error de conexión."; }
         }
 
         function renderizarTabla() {
@@ -177,24 +171,26 @@
             let html = "";
 
             clientesGlobal.filter(c => c[1].toLowerCase().includes(busq) || c[3].toLowerCase().includes(busq)).forEach(c => {
-                const fVenc = obtenerFechaLimpia(c[10]);
+                const fVenc = procesarFecha(c[10]);
                 fVenc.setHours(0,0,0,0);
                 const diff = Math.ceil((fVenc.getTime() - hoy.getTime()) / 86400000);
                 
-                const fReg = new Date(parseInt(c[0]) || Date.now());
+                const fReg = new Date(parseInt(c[0]));
                 const costo = parseFloat(c[4]) || 0;
                 const precio = parseFloat(c[5]) || 0;
 
-                if (fReg.toDateString() === hoy.toDateString()) { vD += precio; cD += costo; }
-                if (fReg.getMonth() === hoy.getMonth() && fReg.getFullYear() === hoy.getFullYear()) uM += (precio - costo);
-                if (fReg.getFullYear() === hoy.getFullYear()) uA += (precio - costo);
+                if (!isNaN(fReg.getTime())) {
+                    if (fReg.toDateString() === hoy.toDateString()) { vD += precio; cD += costo; }
+                    if (fReg.getMonth() === hoy.getMonth() && fReg.getFullYear() === hoy.getFullYear()) uM += (precio - costo);
+                    if (fReg.getFullYear() === hoy.getFullYear()) uA += (precio - costo);
+                }
 
                 let color = diff <= 0 ? "status-red" : (diff <= 3 ? "status-yellow" : "status-green");
-                let txtEstado = diff <= 0 ? "VENCIDO" : diff + " DÍAS";
+                let txt = diff <= 0 ? "VENCIDO" : diff + " DÍAS";
 
                 html += `<tr class="hover:bg-slate-800/20">
                     <td class="p-4"><b>${c[1]}</b><br><span class="text-slate-500 text-[9px] font-bold uppercase">${c[3]}</span></td>
-                    <td class="p-4 text-center"><span class="px-3 py-1 rounded-full border font-black text-[9px] ${color}">${txtEstado}</span></td>
+                    <td class="p-4 text-center"><span class="px-3 py-1 rounded-full border font-black text-[9px] ${color}">${txt}</span></td>
                     <td class="p-4 text-center font-mono text-slate-500">${c[10]}</td>
                     <td class="p-4">
                         <div class="flex flex-wrap gap-1 justify-center">
@@ -204,7 +200,7 @@
                             <button onclick="enviarWA('${c[0]}',0)" class="bg-red-600 px-2 py-1 rounded-lg font-black text-[9px] uppercase">0D</button>
                         </div>
                     </td>
-                    <td class="p-4"><button onclick="eliminar('${c[0]}')" class="text-slate-800 hover:text-red-500 font-bold">✖</button></td>
+                    <td class="p-4"><button onclick="eliminar('${c[0]}')" class="text-slate-800 hover:text-red-500">✖</button></td>
                 </tr>`;
             });
 
@@ -226,8 +222,8 @@
                     b += `------------------------------\n📺 *SERVICIO:* ${ser}\n✉️ *Usuario:* ${u[i]||u[0]}\n🔑 *Clave:* ${k[i]||k[0]}\n👤 *Perfil:* ${p[i]||p[0]}\n🔐 *PIN:* ${n[i]||n[0]}\n🗓 *Vence:* ${c[10]}\n------------------------------\n`;
                 });
                 msj = `🚀 *SERVICIOS ACTIVOS - ${c[1]}* ⭐\nGracias por elegir *Planet Streaming*\n\n${b}\n🚨 *REGLAS:* No cambiar datos, usar solo tu perfil. ¡Disfruta! 🍿`;
-            } else if (tipo === 3) msj = `Hola *${c[1]}* 👋\n\nRecordatorio de *Planet Streaming* 🚀: tu servicio de *${c[3]}* vence en *3 días*. ¿Renovamos? 🍿`;
-            else if (tipo === 0) msj = `¡Hola *${c[1]}*! 🚨\n\nTu servicio de *${c[3]}* **VENCE HOY**. Renueva ahora para evitar cortes. ⏳`;
+            } else if (tipo === 3) msj = `Hola *${c[1]}* 👋\n\nRecordatorio de *Planet Streaming* 🚀: tu servicio de *${c[3]}* vence en *3 días*. ¿Deseas renovar? 🍿`;
+            else if (tipo === 0) msj = `¡Hola *${c[1]}*! 🚨\n\nTu servicio de *${c[3]}* **VENCE HOY**. Renueva ahora para evitar el corte. ⏳`;
             
             window.open(`https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(msj)}`);
         }
@@ -235,7 +231,7 @@
         async function renovar(id) {
             const c = clientesGlobal.find(x => x[0].toString() === id.toString());
             if (confirm(`¿Renovar 30 días a ${c[1]}?`)) {
-                let fv = obtenerFechaLimpia(c[10]);
+                let fv = procesarFecha(c[10]);
                 fv.setDate(fv.getDate() + 30);
                 await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'UPDATE', id: id, vencimiento: fv.toISOString().split('T')[0] }) });
                 location.reload();
@@ -250,7 +246,7 @@
         }
 
         window.onload = () => {
-            initGrid(); cargarDatos();
+            initGrid(); cargar();
             document.getElementById('fechaVencimiento').value = new Date(Date.now() + 2592000000).toISOString().split('T')[0];
         };
     </script>
