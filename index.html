@@ -124,7 +124,7 @@
             const tel = document.getElementById('telefonoCliente').value.trim();
             const bloques = document.querySelectorAll('.bloque-servicio');
             if (!nom || !tel || bloques.length === 0) { alert("⚠️ Completa los datos."); return; }
-            btn.innerText = "PROCESANDO..."; btn.disabled = true;
+            btn.innerText = "GUARDANDO..."; btn.disabled = true;
             let s=[], u=[], k=[], p=[], n=[];
             bloques.forEach(b => {
                 s.push(b.dataset.name);
@@ -134,7 +134,8 @@
                 n.push(b.querySelector('.val-pin').value || '---');
             });
             const data = {
-                id: Date.now(), nombre: nom.toUpperCase(), telefono: tel,
+                id: Date.now().toString(), // Aseguramos que el ID sea string
+                nombre: nom.toUpperCase(), telefono: tel,
                 servicio: s.join(" + "), costo: document.getElementById('costoServicio').value,
                 precio: document.getElementById('precioVenta').value, correo: u.join(" , "),
                 clave: k.join(" , "), perfil: p.join(" , "), pin: n.join(" , "),
@@ -148,11 +149,12 @@
 
         async function cargar() {
             try {
-                const r = await fetch(API_URL);
+                // Añadimos un timestamp para evitar caché del navegador
+                const r = await fetch(API_URL + "?t=" + Date.now());
                 clientesGlobal = await r.json();
                 document.getElementById('loader').style.display = 'none';
                 renderizarTabla();
-            } catch (e) { document.getElementById('loader').innerText = "Error."; }
+            } catch (e) { document.getElementById('loader').innerText = "Error de conexión."; }
         }
 
         function renderizarTabla() {
@@ -180,13 +182,14 @@
                 let txt = diff <= 0 ? "VENCIDO" : diff + " DÍAS";
                 const fechaLimpia = c[10].toString().split("T")[0];
 
+                // Usamos el ID (c[0]) directamente en las funciones
                 html += `<tr class="hover:bg-slate-800/20">
                     <td class="p-4"><b>${c[1]}</b><br><span class="text-slate-500 text-[9px] font-bold uppercase">${c[3]}</span></td>
                     <td class="p-4 text-center"><span class="px-3 py-1 rounded-full border font-black text-[9px] ${color}">${txt}</span></td>
                     <td class="p-4 text-center font-mono text-slate-500">${fechaLimpia}</td>
                     <td class="p-4 text-center">
                         <div class="flex flex-wrap gap-1 justify-center">
-                            <button onclick="enviarWA('${c[0]}','datos')" class="bg-blue-600 px-2 py-1 rounded-lg font-black text-[9px] uppercase">Enviar Cuenta</button>
+                            <button onclick="enviarWA('${c[0]}','datos')" class="bg-blue-600 px-2 py-1 rounded-lg font-black text-[9px] uppercase hover:opacity-80">Enviar Cuenta</button>
                             <button onclick="renovar('${c[0]}')" class="bg-emerald-600 px-2 py-1 rounded-lg font-black text-[9px] uppercase">Renovar</button>
                             <button onclick="enviarWA('${c[0]}',3)" class="bg-yellow-500 text-black px-2 py-1 rounded-lg font-black text-[9px] uppercase">3D</button>
                             <button onclick="enviarWA('${c[0]}',0)" class="bg-red-600 px-2 py-1 rounded-lg font-black text-[9px] uppercase">0D</button>
@@ -204,10 +207,18 @@
         }
 
         function enviarWA(id, tipo) {
-            const c = clientesGlobal.find(x => x[0].toString() === id.toString());
-            const num = c[2].toString().replace(/\D/g, '');
+            // Buscamos el cliente forzando comparación de strings para evitar fallos de ID
+            const c = clientesGlobal.find(x => x[0].toString().trim() === id.toString().trim());
+            
+            if (!c) {
+                alert("⚠️ Error: Datos aún no sincronizados. Refresca la página.");
+                return;
+            }
+
+            const num = c[2].toString().replace(/\D/g, ''); // Limpiamos el número de cualquier carácter no numérico
             const fechaLimpia = c[10].toString().split("T")[0]; 
             let msj = "";
+
             if (tipo === 'datos') {
                 const s = c[3].split(" + "), u = c[6].split(" , "), k = c[7].split(" , "), p = c[8].split(" , "), n = c[9].split(" , ");
                 let b = ""; 
@@ -220,7 +231,9 @@
             } else if (tipo === 0) {
                 msj = `¡Hola *${c[1]}*! 🚨\n\nTu servicio **VENCE HOY**. Renueva ahora para evitar el corte. ⏳`;
             }
-            window.open(`https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(msj)}`);
+            
+            const link = `https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(msj)}`;
+            window.open(link, '_blank');
         }
 
         async function renovar(id) {
