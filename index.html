@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Streaming Planet - Panel de Control</title>
+    <title>Planet Streaming - Panel de Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
@@ -21,9 +21,9 @@
         <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
             <div><p class="text-[10px] text-slate-500 font-bold uppercase">Ventas Hoy</p><h2 id="gananciaDia" class="text-xl font-black">$0.00</h2></div>
             <div><p class="text-[10px] text-slate-500 font-bold uppercase">Costo Hoy</p><h2 id="costoDia" class="text-xl font-black text-red-500">$0.00</h2></div>
-            <div class="border-x border-slate-800"><p class="text-[10px] text-blue-400 font-bold uppercase">Utilidad</p><h2 id="netoDia" class="text-xl font-black text-blue-400">$0.00</h2></div>
-            <div><p class="text-[10px] text-slate-500 font-bold uppercase">Mes</p><h2 id="gananciaMes" class="text-xl font-black text-emerald-500">$0.00</h2></div>
-            <div><p class="text-[10px] text-slate-500 font-bold uppercase">Año</p><h2 id="gananciaAnio" class="text-xl font-black text-slate-300">$0.00</h2></div>
+            <div class="border-x border-slate-800"><p class="text-[10px] text-blue-400 font-bold uppercase">Utilidad Diaria</p><h2 id="netoDia" class="text-xl font-black text-blue-400">$0.00</h2></div>
+            <div><p class="text-[10px] text-slate-500 font-bold uppercase">Utilidad Mes</p><h2 id="gananciaMes" class="text-xl font-black text-emerald-500">$0.00</h2></div>
+            <div><p class="text-[10px] text-slate-500 font-bold uppercase">Utilidad Año</p><h2 id="gananciaAnio" class="text-xl font-black text-slate-300">$0.00</h2></div>
         </div>
     </div>
 
@@ -71,7 +71,7 @@
                         <tbody id="cuerpoTabla" class="text-[11px] divide-y divide-slate-800/30"></tbody>
                     </table>
                 </div>
-                <div id="loader" class="p-10 text-center text-slate-600 animate-pulse font-bold uppercase text-[10px]">Cargando Streaming Planet...</div>
+                <div id="loader" class="p-10 text-center text-slate-600 animate-pulse font-bold uppercase text-[10px]">Cargando Planet Streaming...</div>
             </div>
         </div>
     </div>
@@ -160,6 +160,7 @@
             const tbody = document.getElementById('cuerpoTabla');
             const busq = document.getElementById('buscador').value.toLowerCase();
             const hoy = new Date(); hoy.setHours(0,0,0,0);
+            
             let vD=0, cD=0, uM=0, uA=0;
             let html = "";
 
@@ -167,14 +168,23 @@
                 const fVenc = procesarFecha(c[10]);
                 fVenc.setHours(0,0,0,0);
                 const diff = Math.ceil((fVenc.getTime() - hoy.getTime()) / 86400000);
+                
                 const fReg = new Date(parseInt(c[0]));
                 const costo = parseFloat(c[4]) || 0;
                 const precio = parseFloat(c[5]) || 0;
+                const utilidad = precio - costo;
 
                 if (!isNaN(fReg.getTime())) {
-                    if (fReg.toDateString() === hoy.toDateString()) { vD += precio; cD += costo; }
-                    if (fReg.getMonth() === hoy.getMonth() && fReg.getFullYear() === hoy.getFullYear()) uM += (precio - costo);
-                    if (fReg.getFullYear() === hoy.getFullYear()) uA += (precio - costo);
+                    if (fReg.toDateString() === hoy.toDateString()) { 
+                        vD += precio; 
+                        cD += costo; 
+                    }
+                    if (fReg.getMonth() === hoy.getMonth() && fReg.getFullYear() === hoy.getFullYear()) {
+                        uM += utilidad;
+                    }
+                    if (fReg.getFullYear() === hoy.getFullYear()) {
+                        uA += utilidad;
+                    }
                 }
 
                 let color = diff <= 0 ? "status-red" : (diff <= 3 ? "status-yellow" : "status-green");
@@ -187,8 +197,8 @@
                     <td class="p-4 text-center font-mono text-slate-500">${fechaLimpia}</td>
                     <td class="p-4 text-center">
                         <div class="flex flex-wrap gap-1 justify-center">
-                            <button onclick="enviarWA('${c[0]}','datos')" class="bg-blue-600 px-2 py-1 rounded-lg font-black text-[9px] uppercase hover:opacity-80">Enviar</button>
-                            <button onclick="renovar('${c[0]}')" class="bg-emerald-600 px-2 py-1 rounded-lg font-black text-[9px] uppercase hover:scale-105 transition-transform">Renovar +30D</button>
+                            <button onclick="enviarWA('${c[0]}','datos')" class="bg-blue-600 px-2 py-1 rounded-lg font-black text-[9px] uppercase">Enviar</button>
+                            <button onclick="renovar('${c[0]}')" class="bg-emerald-600 px-2 py-1 rounded-lg font-black text-[9px] uppercase">Renovar</button>
                             <button onclick="enviarWA('${c[0]}',3)" class="bg-yellow-500 text-black px-2 py-1 rounded-lg font-black text-[9px] uppercase">3D</button>
                             <button onclick="enviarWA('${c[0]}',0)" class="bg-red-600 px-2 py-1 rounded-lg font-black text-[9px] uppercase">0D</button>
                         </div>
@@ -196,66 +206,63 @@
                     <td class="p-4"><button onclick="eliminar('${c[0]}')" class="text-slate-800 hover:text-red-500">✖</button></td>
                 </tr>`;
             });
+
             tbody.innerHTML = html;
+            
             document.getElementById('gananciaDia').innerText = `$${vD.toFixed(2)}`;
             document.getElementById('costoDia').innerText = `$${cD.toFixed(2)}`;
-            document.getElementById('netoDia').innerText = `$${(vD-cD).toFixed(2)}`;
+            document.getElementById('netoDia').innerText = `$${(vD - cD).toFixed(2)}`;
             document.getElementById('gananciaMes').innerText = `$${uM.toFixed(2)}`;
             document.getElementById('gananciaAnio').innerText = `$${uA.toFixed(2)}`;
         }
 
         async function renovar(id) {
             const c = clientesGlobal.find(x => x[0].toString().trim() === id.toString().trim());
-            if (!c) return alert("Cliente no encontrado.");
+            if (!c) return alert("Error al encontrar cliente.");
 
-            if (confirm(`¿Renovar 30 días a ${c[1]}?\nEsto actualizará la fecha y sumará el volumen de venta hoy.`)) {
-                // Calcular nueva fecha: 30 días después de la fecha de vencimiento actual
+            if (confirm(`¿Renovar 30 días a ${c[1]}?\nSe actualizará la fecha y contará como venta de hoy.`)) {
                 let fv = procesarFecha(c[10]);
                 fv.setDate(fv.getDate() + 30);
                 const nuevaFechaStr = fv.toISOString().split('T')[0];
 
-                // Para actualizar el volumen, "engañamos" al sistema mandando el ID original 
-                // pero con un nuevo timestamp de registro para que cuente como "venta de hoy"
                 const dataUpdate = {
                     action: 'UPDATE',
                     id: id,
                     vencimiento: nuevaFechaStr,
-                    // Re-enviamos estos datos para asegurar que se mantengan en la fila
                     costo: c[4], 
                     precio: c[5],
-                    // Importante: Actualizamos el timestamp del ID para que el Dashboard lo cuente HOY
                     nuevoId: Date.now().toString() 
                 };
 
                 try {
                     await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dataUpdate) });
-                    alert("✅ Renovación exitosa. Fecha y volumen actualizados.");
+                    alert("✅ Renovado y saldo actualizado.");
                     location.reload();
                 } catch (e) {
-                    alert("Error al renovar.");
+                    alert("Error en la conexión.");
                 }
             }
         }
 
         function enviarWA(id, tipo) {
             const c = clientesGlobal.find(x => x[0].toString().trim() === id.toString().trim());
-            if (!c) return alert("⚠️ Error: Datos no sincronizados.");
+            if (!c) return alert("⚠️ Error de sincronización.");
 
             const num = c[2].toString().replace(/\D/g, '');
-            const fechaLimpia = c[10].toString().split("T")[0]; 
+            const servicio = c[3];
             let msj = "";
 
             if (tipo === 'datos') {
                 const s = c[3].split(" + "), u = c[6].split(" , "), k = c[7].split(" , "), p = c[8].split(" , "), n = c[9].split(" , ");
                 let b = ""; 
                 s.forEach((ser, i) => {
-                    b += `📺 SERVICIO: ${ser}\n✉️ Usuario: ${u[i]||u[0]}\n🔑 Contraseña: ${k[i]||k[0]}\n👤 Perfil: ${p[i]||p[0]}\n🔐 PIN: ${n[i]||n[0]}\n🗓 Vence: ${fechaLimpia}\n------------------------------\n`;
+                    b += `📺 SERVICIO: ${ser}\n✉️ Usuario: ${u[i]||u[0]}\n🔑 Contraseña: ${k[i]||k[0]}\n👤 Perfil: ${p[i]||p[0]}\n🔐 PIN: ${n[i]||n[0]}\n🗓 Vence: ${c[10].split("T")[0]}\n------------------------------\n`;
                 });
-                msj = `🚀 SERVICIOS ACTIVOS - ${c[1]} ⭐\nGracias por preferir *Streaming Planet*\n\n${b}🚨 REGLAS IMPORTANTES:\n* No cambiar datos de la cuenta.\n* Usar solo el perfil asignado.\n* Disfruta tu programación 🍿.`;
+                msj = `🚀 SERVICIOS ACTIVOS - ${c[1]} ⭐\nGracias por preferir *Planet Streaming*\n\n${b}🚨 REGLAS IMPORTANTES:\n* No cambiar datos de la cuenta.\n* Usar solo el perfil asignado.\n* Disfruta tu programación 🍿.`;
             } else if (tipo === 3) {
-                msj = `Hola *${c[1]}* 👋\n\nRecordatorio de *Streaming Planet* 🚀: tu servicio vence en *3 días*. ¿Renovamos? 🍿`;
+                msj = `Hola *${c[1]}* 👋\n\nRecordatorio de *Planet Streaming* 🚀: tu servicio *${servicio}* vence en *3 días*. ¿Renovamos? 🍿`;
             } else if (tipo === 0) {
-                msj = `¡Hola *${c[1]}*! 🚨\n\nTu servicio **VENCE HOY**. Renueva ahora para evitar el corte. ⏳`;
+                msj = `¡Hola *${c[1]}*! 🚨\n\nTu servicio de *${servicio}* **VENCE HOY**. Renueva ahora para evitar el corte y seguir disfrutando con *Planet Streaming*. ⏳🍿`;
             }
             window.open(`https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(msj)}`, '_blank');
         }
