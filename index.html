@@ -249,21 +249,25 @@
             if (!c) return alert("⚠️ Error de sincronización.");
 
             const num = c[2].toString().replace(/\D/g, '');
-            const servicio = c[3];
+            const fechaLimpia = c[10].toString().split("T")[0]; 
+            
+            // Lógica para extraer datos de las cuentas (soporta múltiples servicios por fila)
+            const s = c[3].split(" + "), u = c[6].split(" , "), k = c[7].split(" , "), p = c[8].split(" , "), n = c[9].split(" , ");
+            let bloqueCuentas = ""; 
+            s.forEach((ser, i) => {
+                bloqueCuentas += `📺 SERVICIO: ${ser}\n✉️ Correo: ${u[i]||u[0]}\n🔑 Clave: ${k[i]||k[0]}\n👤 Perfil: ${p[i]||p[0]}\n🔐 PIN: ${n[i]||n[0]}\n🗓 Vence: ${fechaLimpia}\n------------------------------\n`;
+            });
+
             let msj = "";
 
             if (tipo === 'datos') {
-                const s = c[3].split(" + "), u = c[6].split(" , "), k = c[7].split(" , "), p = c[8].split(" , "), n = c[9].split(" , ");
-                let b = ""; 
-                s.forEach((ser, i) => {
-                    b += `📺 SERVICIO: ${ser}\n✉️ Usuario: ${u[i]||u[0]}\n🔑 Contraseña: ${k[i]||k[0]}\n👤 Perfil: ${p[i]||p[0]}\n🔐 PIN: ${n[i]||n[0]}\n🗓 Vence: ${c[10].split("T")[0]}\n------------------------------\n`;
-                });
-                msj = `🚀 SERVICIOS ACTIVOS - ${c[1]} ⭐\nGracias por preferir *Planet Streaming*\n\n${b}🚨 REGLAS IMPORTANTES:\n* No cambiar datos de la cuenta.\n* Usar solo el perfil asignado.\n* Disfruta tu programación 🍿.`;
+                msj = `🚀 *PLANET STREAMING* - DETALLES ⭐\nHola *${c[1]}*, aquí tienes los datos de tu cuenta:\n\n${bloqueCuentas}🚨 REGLAS:\n* No cambiar datos.\n* No crear perfiles adicionales.\n* Disfruta tu programación 🍿.`;
             } else if (tipo === 3) {
-                msj = `Hola *${c[1]}* 👋\n\nRecordatorio de *Planet Streaming* 🚀: tu servicio *${servicio}* vence en *3 días*. ¿Renovamos? 🍿`;
+                msj = `Hola *${c[1]}* 👋\n\nRecordatorio de *Planet Streaming* 🚀\nTu servicio está a *3 DÍAS* de vencer. Te enviamos los datos para que verifiques cuál es:\n\n${bloqueCuentas}¿Renovamos para que no pierdas el acceso? 🍿`;
             } else if (tipo === 0) {
-                msj = `¡Hola *${c[1]}*! 🚨\n\nTu servicio de *${servicio}* **VENCE HOY**. Renueva ahora para evitar el corte y seguir disfrutando con *Planet Streaming*. ⏳🍿`;
+                msj = `¡Hola *${c[1]}*! 🚨\n\nTu servicio en *Planet Streaming* **VENCE HOY**. Esta es la cuenta:\n\n${bloqueCuentas}Renueva ahora para evitar el corte inmediato. ⏳🍿`;
             }
+            
             window.open(`https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(msj)}`, '_blank');
         }
 
