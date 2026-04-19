@@ -3,75 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planet Streaming - Panel de Control</title>
+    <title>Streaming Planet - Panel Administrativo V2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; }
-        .btn-plataforma.active { background: #2563eb !important; color: white !important; border-color: #60a5fa; box-shadow: 0 0 15px rgba(37, 99, 235, 0.3); }
-        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
         .status-green { color: #10b981; border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
         .status-yellow { color: #fbbf24; border-color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
         .status-red { color: #ef4444; border-color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+        .btn-plataforma.active { background: #2563eb !important; color: white !important; border-color: #60a5fa; box-shadow: 0 0 15px rgba(37, 99, 235, 0.4); }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .cart-item { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="pb-10">
 
     <div class="sticky top-0 z-50 p-4 glass mb-6">
-        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
-            <div><p class="text-[10px] text-slate-500 font-bold uppercase">Ventas Hoy</p><h2 id="gananciaDia" class="text-xl font-black">$0.00</h2></div>
-            <div><p class="text-[10px] text-slate-500 font-bold uppercase">Costo Hoy</p><h2 id="costoDia" class="text-xl font-black text-red-500">$0.00</h2></div>
-            <div class="border-x border-slate-800"><p class="text-[10px] text-blue-400 font-bold uppercase">Utilidad Diaria</p><h2 id="netoDia" class="text-xl font-black text-blue-400">$0.00</h2></div>
-            <div><p class="text-[10px] text-slate-500 font-bold uppercase">Utilidad Mes</p><h2 id="gananciaMes" class="text-xl font-black text-emerald-500">$0.00</h2></div>
-            <div><p class="text-[10px] text-slate-500 font-bold uppercase">Utilidad Año</p><h2 id="gananciaAnio" class="text-xl font-black text-slate-300">$0.00</h2></div>
+        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="text-center">
+                <p class="text-[10px] uppercase text-slate-500 font-bold tracking-widest">Ventas Hoy</p>
+                <h2 id="gananciaDia" class="text-xl font-black text-white">$0.00</h2>
+            </div>
+            <div class="text-center">
+                <p class="text-[10px] uppercase text-slate-500 font-bold tracking-widest">Costo Hoy</p>
+                <h2 id="costoDia" class="text-xl font-black text-red-500">$0.00</h2>
+            </div>
+            <div class="text-center border-x border-slate-800">
+                <p class="text-[10px] uppercase text-blue-400 font-bold tracking-widest">Utilidad Hoy</p>
+                <h2 id="netoDia" class="text-xl font-black text-blue-400">$0.00</h2>
+            </div>
+            <div class="text-center">
+                <p class="text-[10px] uppercase text-slate-500 font-bold tracking-widest">Utilidad Mes</p>
+                <h2 id="gananciaMes" class="text-xl font-black text-emerald-500">$0.00</h2>
+            </div>
+            <div class="text-center">
+                <p class="text-[10px] uppercase text-slate-500 font-bold tracking-widest">Utilidad Año</p>
+                <h2 id="gananciaAnio" class="text-xl font-black text-slate-300">$0.00</h2>
+            </div>
         </div>
     </div>
 
     <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
         <div class="lg:col-span-4 space-y-6">
             <div class="bg-slate-900/50 p-6 rounded-3xl border border-slate-800 shadow-2xl">
-                <h3 class="text-blue-500 font-black text-sm uppercase mb-6 flex items-center gap-2">Nuevo Registro</h3>
+                <h3 class="text-blue-500 font-black text-sm uppercase mb-6 flex items-center gap-2">
+                    <span class="w-2 h-2 bg-blue-500 rounded-full animate-ping"></span>
+                    Nueva Venta Multiservicio
+                </h3>
+                
                 <div class="space-y-4">
-                    <input type="text" id="nombreCliente" placeholder="NOMBRE DEL CLIENTE" class="w-full bg-slate-950 p-4 rounded-xl border border-slate-800 outline-none text-white text-xs font-bold uppercase">
-                    <input type="text" id="telefonoCliente" placeholder="WHATSAPP (Ej: 58412...)" class="w-full bg-slate-950 p-4 rounded-xl border border-slate-800 outline-none text-white text-xs">
-                    <div id="gridPlataformas" class="grid grid-cols-3 gap-2 max-h-40 overflow-y-auto pr-2"></div>
-                    <div id="contenedorDatosDinamicos" class="space-y-3"></div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
-                            <p class="text-[9px] text-slate-500 font-bold uppercase">Costo $</p>
-                            <input type="number" id="costoServicio" step="0.01" class="bg-transparent w-full text-center outline-none font-bold" value="0.00">
+                    <input type="text" id="nombre" placeholder="NOMBRE DEL CLIENTE" class="w-full bg-slate-950 p-4 rounded-xl border border-slate-800 outline-none focus:border-blue-500 uppercase font-bold text-white text-xs transition-all">
+                    <input type="number" id="telefono" placeholder="WHATSAPP (Ej: 58412...)" class="w-full bg-slate-950 p-4 rounded-xl border border-slate-800 outline-none focus:border-blue-500 text-white text-xs">
+                    
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-500 uppercase mb-3 tracking-widest">Paso 1: Elige los servicios</p>
+                        <div id="gridPlataformas" class="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto pr-2">
+                            </div>
+                    </div>
+
+                    <div id="contenedorDatosDinamicos" class="space-y-3 mt-4">
                         </div>
-                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
-                            <p class="text-[9px] text-blue-500 font-bold uppercase">Venta $</p>
-                            <input type="number" id="precioVenta" step="0.01" class="bg-transparent w-full text-center outline-none font-bold text-blue-400" value="0.00">
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                            <p class="text-[9px] text-slate-500 uppercase font-bold mb-1 text-center">Costo Total ($)</p>
+                            <input type="number" id="costo" step="0.01" class="bg-transparent w-full text-center outline-none text-white font-bold" value="0.00">
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                            <p class="text-[9px] text-blue-500 uppercase font-bold mb-1 text-center">Venta Total ($)</p>
+                            <input type="number" id="precio" step="0.01" class="bg-transparent w-full text-center outline-none text-blue-400 font-bold" value="0.00">
                         </div>
                     </div>
-                    <input type="date" id="fechaVencimiento" class="w-full bg-slate-950 p-4 rounded-xl border border-slate-800 text-white text-xs font-bold">
-                    <button onclick="guardarRegistro()" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl uppercase text-xs tracking-widest">Guardar Registro</button>
+
+                    <div class="pt-2">
+                        <p class="text-[9px] text-slate-500 uppercase font-bold mb-1">Fecha de Vencimiento (General)</p>
+                        <input type="date" id="vencimiento" class="w-full bg-slate-950 p-4 rounded-xl border border-slate-800 text-white text-xs font-bold focus:border-blue-500 transition-all">
+                    </div>
+                    
+                    <button onclick="guardarEnGoogle()" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl transition-all uppercase text-xs tracking-[0.2em] shadow-lg shadow-blue-900/20">
+                        Confirmar y Guardar Todo
+                    </button>
                 </div>
             </div>
         </div>
 
         <div class="lg:col-span-8">
-            <div class="bg-slate-900/50 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl">
-                <div class="p-4 border-b border-slate-800">
-                    <input type="text" id="buscador" oninput="renderizarTabla()" placeholder="Buscar cliente o servicio..." class="w-full bg-slate-950 p-3 rounded-xl border border-slate-800 outline-none text-xs text-white">
+            <div class="bg-slate-900/50 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden">
+                <div class="p-6 border-b border-slate-800 flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <h3 class="font-black text-xs uppercase tracking-widest text-slate-400">Clientes Activos</h3>
+                    <input type="text" id="buscador" oninput="renderizarTabla()" placeholder="Buscar cliente o servicio..." class="w-full md:w-64 bg-slate-950 p-3 rounded-xl border border-slate-800 outline-none text-xs text-white focus:border-blue-500">
                 </div>
+
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-950 text-slate-500 uppercase text-[9px] font-black">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-950/50 text-slate-500 uppercase text-[9px] font-black tracking-tighter">
                             <tr>
-                                <th class="p-4">Cliente / Servicio</th>
-                                <th class="p-4 text-center">Estado</th>
-                                <th class="p-4 text-center">Vence</th>
-                                <th class="p-4 text-center">Gestión</th>
-                                <th class="p-4"></th>
+                                <th class="p-5 border-b border-slate-800">Cliente / Plan</th>
+                                <th class="p-5 border-b border-slate-800 text-center">Estado</th>
+                                <th class="p-5 border-b border-slate-800 text-center">Vencimiento</th>
+                                <th class="p-5 border-b border-slate-800 text-center">Acciones</th>
+                                <th class="p-5 border-b border-slate-800"></th>
                             </tr>
                         </thead>
-                        <tbody id="cuerpoTabla" class="text-[11px] divide-y divide-slate-800/30"></tbody>
+                        <tbody id="cuerpoTabla" class="text-[11px] divide-y divide-slate-800/30">
+                            </tbody>
                     </table>
                 </div>
-                <div id="loader" class="p-10 text-center text-slate-600 animate-pulse font-bold uppercase text-[10px]">Cargando Planet Streaming...</div>
+                <div id="loader" class="p-20 text-center text-slate-600 italic animate-pulse">Consultando base de datos...</div>
             </div>
         </div>
     </div>
@@ -79,208 +121,237 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxRFID-dOQuNJcC2b74GmpYXJ9Do6w5U0yQy89IPy1Y805owu__Xce3yRI9eDBnVpjz/exec";
         let clientesGlobal = [];
-        const listaPlat = ["NETFLIX PERFIL", "NETFLIX PERSONAL", "DISNEY+", "MAX", "PRIME VIDEO", "PARAMOUNT+", "IPTV", "FLUJO TV", "TELELATINO", "VIX", "YOUTUBE", "SPOTIFY", "CRUNCHYROLL", "VIKI RAKUTEN", "CANVA PRO"];
+        let carritoServicios = []; 
 
-        function procesarFecha(v) {
-            if (!v) return new Date();
-            let s = v.toString().split("T")[0].trim();
-            let p = s.split("-");
-            return p.length === 3 ? new Date(p[0], p[1]-1, p[2]) : new Date(v);
-        }
+        const listaPlat = [
+            "NETFLIX PERFIL", "NETFLIX PERSONAL", "DISNEY+", "MAX", "PRIME VIDEO", 
+            "PARAMOUNT+", "IPTV", "FLUJO TV", "TELELATINO", "VIX", 
+            "YOUTUBE", "SPOTIFY", "CRUNCHYROLL", "VIKI RAKUTEN", "CANVA PRO"
+        ];
 
+        // Inicializa los botones de servicios
         function initGrid() {
             const grid = document.getElementById('gridPlataformas');
             listaPlat.forEach(p => {
                 const btn = document.createElement('button');
                 btn.innerText = p;
-                btn.className = "btn-plataforma p-2 rounded-lg text-[8px] font-bold bg-slate-800 text-slate-400 border border-slate-700 transition-all";
-                btn.onclick = () => { btn.classList.toggle('active'); actInputs(); };
+                btn.id = `btn-${p.replace(/\s+/g, '-')}`;
+                btn.className = "btn-plataforma p-2 rounded-lg text-[8px] font-bold bg-slate-800 text-slate-400 border border-slate-700 transition-all hover:border-slate-500";
+                btn.onclick = () => toggleServicio(p);
                 grid.appendChild(btn);
             });
         }
 
-        function actInputs() {
-            const cont = document.getElementById('contenedorDatosDinamicos');
-            const act = document.querySelectorAll('.btn-plataforma.active');
-            cont.innerHTML = '';
-            act.forEach(b => {
+        // Maneja la selección del carrito
+        function toggleServicio(nombre) {
+            const index = carritoServicios.findIndex(s => s.nombre === nombre);
+            const btn = document.getElementById(`btn-${nombre.replace(/\s+/g, '-')}`);
+
+            if (index === -1) {
+                carritoServicios.push({ nombre, correo: '', clave: '', perfil: '', pin: '' });
+                btn.classList.add('active');
+            } else {
+                carritoServicios.splice(index, 1);
+                btn.classList.remove('active');
+            }
+            actualizarFormularios();
+        }
+
+        // Dibuja los formularios según el carrito
+        function actualizarFormularios() {
+            const contenedor = document.getElementById('contenedorDatosDinamicos');
+            if (carritoServicios.length === 0) {
+                contenedor.innerHTML = '<p class="text-slate-700 italic text-center py-6 text-[10px] uppercase border-2 border-dashed border-slate-800 rounded-xl">Selecciona los servicios para empezar</p>';
+                return;
+            }
+
+            contenedor.innerHTML = '';
+            carritoServicios.forEach((serv, i) => {
                 const div = document.createElement('div');
-                div.className = "bg-slate-950 p-4 rounded-xl border border-blue-900/30 bloque-servicio";
-                div.dataset.name = b.innerText;
-                div.innerHTML = `<p class="text-blue-500 font-black text-[9px] mb-2 uppercase">${b.innerText}</p>
-                    <input type="text" placeholder="Correo" class="val-u w-full bg-transparent border-b border-slate-800 mb-2 outline-none text-[11px]">
-                    <input type="text" placeholder="Clave" class="val-p w-full bg-transparent border-b border-slate-800 mb-2 outline-none text-[11px]">
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="text" placeholder="Perfil" class="val-perf bg-slate-900 p-1 rounded text-[10px]">
-                        <input type="text" placeholder="PIN" class="val-pin bg-slate-900 p-1 rounded text-[10px]">
+                div.className = "cart-item bg-slate-950 p-4 rounded-2xl border border-blue-600/20 space-y-2 relative";
+                div.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="text-blue-500 font-black text-[9px] uppercase tracking-widest">${serv.nombre}</p>
+                        <button onclick="toggleServicio('${serv.nombre}')" class="text-slate-600 hover:text-red-500 text-[10px]">✕</button>
+                    </div>
+                    <input type="text" placeholder="Correo / Usuario" oninput="updateData(${i}, 'correo', this.value)" class="w-full bg-transparent border-b border-slate-800 p-1 outline-none text-white text-[11px] focus:border-blue-500" value="${serv.correo}">
+                    <input type="text" placeholder="Contraseña" oninput="updateData(${i}, 'clave', this.value)" class="w-full bg-transparent border-b border-slate-800 p-1 outline-none text-white text-[11px] focus:border-blue-500" value="${serv.clave}">
+                    <div class="grid grid-cols-2 gap-2 mt-1">
+                        <input type="text" placeholder="Perfil" oninput="updateData(${i}, 'perfil', this.value)" class="bg-slate-900 p-2 rounded-lg text-[10px] text-white border border-slate-800" value="${serv.perfil}">
+                        <input type="text" placeholder="PIN" oninput="updateData(${i}, 'pin', this.value)" class="bg-slate-900 p-2 rounded-lg text-[10px] text-white border border-slate-800" value="${serv.pin}">
                     </div>`;
-                cont.appendChild(div);
+                contenedor.appendChild(div);
             });
         }
 
-        async function guardarRegistro() {
+        function updateData(index, campo, valor) {
+            carritoServicios[index][campo] = valor;
+        }
+
+        async function guardarEnGoogle() {
             const btn = document.getElementById('btnGuardar');
-            const nom = document.getElementById('nombreCliente').value.trim();
-            const tel = document.getElementById('telefonoCliente').value.trim();
-            const bloques = document.querySelectorAll('.bloque-servicio');
-            if (!nom || !tel || bloques.length === 0) { alert("⚠️ Completa los datos."); return; }
-            btn.innerText = "GUARDANDO..."; btn.disabled = true;
-            let s=[], u=[], k=[], p=[], n=[];
-            bloques.forEach(b => {
-                s.push(b.dataset.name);
-                u.push(b.querySelector('.val-u').value || '---');
-                k.push(b.querySelector('.val-p').value || '---');
-                p.push(b.querySelector('.val-perf').value || '---');
-                n.push(b.querySelector('.val-pin').value || '---');
-            });
-            const data = {
+            const nom = document.getElementById('nombre').value.toUpperCase().trim();
+            
+            if (!nom || carritoServicios.length === 0) return alert("Falta el nombre o seleccionar servicios.");
+
+            btn.innerText = "PROCESANDO VENTA..."; 
+            btn.disabled = true;
+
+            // Preparamos los strings concatenados para la base de datos
+            const sNames = carritoServicios.map(s => s.nombre).join(" + ");
+            const sCors = carritoServicios.map(s => s.correo || '---').join(" , ");
+            const sKeys = carritoServicios.map(s => s.clave || '---').join(" , ");
+            const sPerfs = carritoServicios.map(s => s.perfil || '---').join(" , ");
+            const sPins = carritoServicios.map(s => s.pin || '---').join(" , ");
+
+            const payload = {
                 id: Date.now().toString(),
-                nombre: nom.toUpperCase(), telefono: tel,
-                servicio: s.join(" + "), costo: document.getElementById('costoServicio').value,
-                precio: document.getElementById('precioVenta').value, correo: u.join(" , "),
-                clave: k.join(" , "), perfil: p.join(" , "), pin: n.join(" , "),
-                vencimiento: document.getElementById('fechaVencimiento').value
+                nombre: nom,
+                telefono: document.getElementById('telefono').value.trim(),
+                servicio: sNames,
+                costo: Number(document.getElementById('costo').value),
+                precio: Number(document.getElementById('precio').value),
+                correo: sCors,
+                clave: sKeys,
+                perfil: sPerfs,
+                pin: sPins,
+                vencimiento: document.getElementById('vencimiento').value
             };
+
             try {
-                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-                alert("✅ Guardado"); location.reload();
-            } catch (e) { btn.innerText = "ERROR"; btn.disabled = false; }
+                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                alert("¡Venta registrada con éxito!");
+                location.reload();
+            } catch (e) {
+                btn.disabled = false;
+                btn.innerText = "ERROR - REINTENTAR";
+            }
         }
 
-        async function cargar() {
+        async function cargarDatos() {
             try {
                 const r = await fetch(API_URL + "?t=" + Date.now());
                 clientesGlobal = await r.json();
                 document.getElementById('loader').style.display = 'none';
                 renderizarTabla();
-            } catch (e) { document.getElementById('loader').innerText = "Error de conexión."; }
+            } catch (e) {
+                document.getElementById('loader').innerText = "Error de conexión con la base de datos.";
+            }
         }
 
         function renderizarTabla() {
-            const tbody = document.getElementById('cuerpoTabla');
-            const busq = document.getElementById('buscador').value.toLowerCase();
+            const tabla = document.getElementById('cuerpoTabla');
+            const buscar = document.getElementById('buscador').value.toLowerCase();
             const hoy = new Date(); hoy.setHours(0,0,0,0);
             
             let vD=0, cD=0, uM=0, uA=0;
+            let filtrados = clientesGlobal.filter(c => c[1].toString().toLowerCase().includes(buscar) || c[3].toString().toLowerCase().includes(buscar));
+            
             let html = "";
-
-            clientesGlobal.filter(c => c[1].toLowerCase().includes(busq) || c[3].toLowerCase().includes(busq)).forEach(c => {
-                const fVenc = procesarFecha(c[10]);
-                fVenc.setHours(0,0,0,0);
-                const diff = Math.ceil((fVenc.getTime() - hoy.getTime()) / 86400000);
+            filtrados.forEach(c => {
+                const fVenc = procesarFecha(c[10]); fVenc.setHours(0,0,0,0);
+                const diffTime = fVenc.getTime() - hoy.getTime();
+                const diasRestantes = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 
                 const fReg = new Date(parseInt(c[0]));
-                const costo = parseFloat(c[4]) || 0;
-                const precio = parseFloat(c[5]) || 0;
-                const utilidad = precio - costo;
+                const costo = Number(c[4]) || 0;
+                const precio = Number(c[5]) || 0;
 
+                // Estadísticas (Año 2026 como base)
                 if (!isNaN(fReg.getTime())) {
-                    if (fReg.toDateString() === hoy.toDateString()) { 
-                        vD += precio; 
-                        cD += costo; 
-                    }
-                    if (fReg.getMonth() === hoy.getMonth() && fReg.getFullYear() === hoy.getFullYear()) {
-                        uM += utilidad;
-                    }
-                    if (fReg.getFullYear() === hoy.getFullYear()) {
-                        uA += utilidad;
-                    }
+                    if (fReg.toDateString() === hoy.toDateString()) { vD += precio; cD += costo; }
+                    if (fReg.getMonth() === hoy.getMonth() && fReg.getFullYear() === 2026) uM += (precio-costo);
+                    if (fReg.getFullYear() === 2026) uA += (precio-costo);
                 }
 
-                let color = diff <= 0 ? "status-red" : (diff <= 3 ? "status-yellow" : "status-green");
-                let txt = diff <= 0 ? "VENCIDO" : diff + " DÍAS";
-                const fechaLimpia = c[10].toString().split("T")[0];
+                let colorStatus = diasRestantes <= 0 ? "status-red" : (diasRestantes <= 3 ? "status-yellow" : "status-green");
 
-                html += `<tr class="hover:bg-slate-800/20">
-                    <td class="p-4"><b>${c[1]}</b><br><span class="text-slate-500 text-[9px] font-bold uppercase">${c[3]}</span></td>
-                    <td class="p-4 text-center"><span class="px-3 py-1 rounded-full border font-black text-[9px] ${color}">${txt}</span></td>
-                    <td class="p-4 text-center font-mono text-slate-500">${fechaLimpia}</td>
+                html += `<tr class="hover:bg-slate-800/20 transition-all">
+                    <td class="p-4">
+                        <div class="font-black text-blue-400 uppercase tracking-tighter">${c[1]}</div>
+                        <div class="text-[9px] text-slate-500 font-bold">${c[3]}</div>
+                    </td>
                     <td class="p-4 text-center">
-                        <div class="flex flex-wrap gap-1 justify-center">
-                            <button onclick="enviarWA('${c[0]}','datos')" class="bg-blue-600 px-2 py-1 rounded-lg font-black text-[9px] uppercase">Enviar</button>
-                            <button onclick="renovar('${c[0]}')" class="bg-emerald-600 px-2 py-1 rounded-lg font-black text-[9px] uppercase">Renovar</button>
-                            <button onclick="enviarWA('${c[0]}',3)" class="bg-yellow-500 text-black px-2 py-1 rounded-lg font-black text-[9px] uppercase">3D</button>
-                            <button onclick="enviarWA('${c[0]}',0)" class="bg-red-600 px-2 py-1 rounded-lg font-black text-[9px] uppercase">0D</button>
+                        <span class="px-3 py-1 rounded-full border text-[10px] font-black ${colorStatus}">
+                            ${diasRestantes <= 0 ? 'VENCIDO' : diasRestantes + ' DÍAS'}
+                        </span>
+                    </td>
+                    <td class="p-4 text-center font-mono text-slate-500">${c[10].toString().split('T')[0]}</td>
+                    <td class="p-4">
+                        <div class="flex flex-wrap gap-2 justify-center">
+                            <button onclick="enviarMensaje('${c[0]}', 'datos')" class="bg-blue-600 px-3 py-1.5 rounded-lg font-black text-[9px] uppercase hover:bg-blue-500">Enviar Accesos</button>
+                            <button onclick="enviarMensaje('${c[0]}', 3)" class="bg-yellow-500 text-black px-3 py-1.5 rounded-lg font-black text-[9px] uppercase hover:bg-yellow-400">Aviso 3D</button>
+                            <button onclick="enviarMensaje('${c[0]}', 0)" class="bg-red-600 px-3 py-1.5 rounded-lg font-black text-[9px] uppercase hover:bg-red-500">Aviso 0D</button>
                         </div>
                     </td>
-                    <td class="p-4"><button onclick="eliminar('${c[0]}')" class="text-slate-800 hover:text-red-500">✖</button></td>
+                    <td class="p-4 text-right">
+                        <button onclick="eliminar('${c[0]}')" class="text-slate-700 hover:text-red-500 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </td>
                 </tr>`;
             });
 
-            tbody.innerHTML = html;
+            tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center text-slate-600 italic">No se encontraron registros activos</td></tr>';
             
+            // Actualizar Dashboards
             document.getElementById('gananciaDia').innerText = `$${vD.toFixed(2)}`;
             document.getElementById('costoDia').innerText = `$${cD.toFixed(2)}`;
-            document.getElementById('netoDia').innerText = `$${(vD - cD).toFixed(2)}`;
+            document.getElementById('netoDia').innerText = `$${(vD-cD).toFixed(2)}`;
             document.getElementById('gananciaMes').innerText = `$${uM.toFixed(2)}`;
             document.getElementById('gananciaAnio').innerText = `$${uA.toFixed(2)}`;
         }
 
-        async function renovar(id) {
-            const c = clientesGlobal.find(x => x[0].toString().trim() === id.toString().trim());
-            if (!c) return alert("Error al encontrar cliente.");
+        function enviarMensaje(id, tipo) {
+            const cliente = clientesGlobal.find(x => x[0].toString() === id.toString());
+            if (!cliente) return;
 
-            if (confirm(`¿Renovar 30 días a ${c[1]}?\nSe actualizará la fecha y contará como venta de hoy.`)) {
-                let fv = procesarFecha(c[10]);
-                fv.setDate(fv.getDate() + 30);
-                const nuevaFechaStr = fv.toISOString().split('T')[0];
+            let num = cliente[2].toString().replace(/\D/g, '');
+            const sNames = cliente[3].toString().split(" + ");
+            const sCors = cliente[6].toString().split(" , ");
+            const sKeys = cliente[7].toString().split(" , ");
+            const sPerfs = cliente[8].toString().split(" , ");
+            const sPins = cliente[9].toString().split(" , ");
+            const fVenc = cliente[10].toString().split('T')[0];
 
-                const dataUpdate = {
-                    action: 'UPDATE',
-                    id: id,
-                    vencimiento: nuevaFechaStr,
-                    costo: c[4], 
-                    precio: c[5],
-                    nuevoId: Date.now().toString() 
-                };
-
-                try {
-                    await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dataUpdate) });
-                    alert("✅ Renovado y saldo actualizado.");
-                    location.reload();
-                } catch (e) {
-                    alert("Error en la conexión.");
-                }
-            }
-        }
-
-        function enviarWA(id, tipo) {
-            const c = clientesGlobal.find(x => x[0].toString().trim() === id.toString().trim());
-            if (!c) return alert("⚠️ Error de sincronización.");
-
-            const num = c[2].toString().replace(/\D/g, '');
-            const fechaLimpia = c[10].toString().split("T")[0]; 
-            
-            // Lógica para extraer datos de las cuentas (soporta múltiples servicios por fila)
-            const s = c[3].split(" + "), u = c[6].split(" , "), k = c[7].split(" , "), p = c[8].split(" , "), n = c[9].split(" , ");
-            let bloqueCuentas = ""; 
-            s.forEach((ser, i) => {
-                bloqueCuentas += `📺 SERVICIO: ${ser}\n✉️ Correo: ${u[i]||u[0]}\n🔑 Clave: ${k[i]||k[0]}\n👤 Perfil: ${p[i]||p[0]}\n🔐 PIN: ${n[i]||n[0]}\n🗓 Vence: ${fechaLimpia}\n------------------------------\n`;
+            let detalleSuscripciones = "";
+            sNames.forEach((s, i) => {
+                detalleSuscripciones += `📺 *${s.trim()}*\n✉️ *Usuario:* ${(sCors[i] || sCors[0]).trim()}\n🔑 *Clave:* ${(sKeys[i] || sKeys[0]).trim()}\n👤 *Perfil:* ${(sPerfs[i] || sPerfs[0]).trim()}\n🔐 *PIN:* ${(sPins[i] || sPins[0]).trim()}\n------------------\n`;
             });
 
             let msj = "";
-
             if (tipo === 'datos') {
-                msj = `🚀 *PLANET STREAMING* - DETALLES ⭐\nHola *${c[1]}*, aquí tienes los datos de tu cuenta:\n\n${bloqueCuentas}🚨 REGLAS:\n* No cambiar datos.\n* No crear perfiles adicionales.\n* Disfruta tu programación 🍿.`;
+                msj = `🚀 *PLANET STREAMING - TUS ACCESOS* ⭐\n\nHola *${cliente[1]}*, aquí tienes los detalles de tu compra:\n\n${detalleSuscripciones}🗓 *Vencimiento:* ${fVenc}\n\n¡Gracias por preferirnos! Disfruta tu programación 🍿`;
             } else if (tipo === 3) {
-                msj = `Hola *${c[1]}* 👋\n\nRecordatorio de *Planet Streaming* 🚀\nTu servicio está a *3 DÍAS* de vencer. Te enviamos los datos para que verifiques cuál es:\n\n${bloqueCuentas}¿Renovamos para que no pierdas el acceso? 🍿`;
+                msj = `Hola *${cliente[1]}* 👋\n\nTe recordamos que tu suscripción vence en *3 DÍAS*.\n\n*Servicios:* ${cliente[3]}\n\n¿Deseas renovar para no perder tu perfil? 🍿`;
             } else if (tipo === 0) {
-                msj = `¡Hola *${c[1]}*! 🚨\n\nTu servicio en *Planet Streaming* **VENCE HOY**. Esta es la cuenta:\n\n${bloqueCuentas}Renueva ahora para evitar el corte inmediato. ⏳🍿`;
+                msj = `⚠️ *¡AVISO DE VENCIMIENTO!* ⚠️\n\nHola *${cliente[1]}*, tu servicio de *${cliente[3]}* vence el día de *HOY*.\n\nQuedamos atentos a tu renovación para evitar el corte del servicio. ⏳🍿`;
             }
-            
-            window.open(`https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(msj)}`, '_blank');
+
+            window.open(`https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(msj)}`, "_blank");
         }
 
         async function eliminar(id) {
-            if(confirm("¿Eliminar?")) {
+            if (confirm("¿Seguro que deseas eliminar este cliente del sistema?")) {
                 await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', id: id }) });
                 location.reload();
             }
         }
 
+        function procesarFecha(v) {
+            if (!v) return new Date();
+            let s = v.toString().split("T")[0];
+            let p = s.split("-");
+            return p.length === 3 ? new Date(p[0], p[1]-1, p[2]) : new Date(v);
+        }
+
         window.onload = () => {
-            initGrid(); cargar();
-            document.getElementById('fechaVencimiento').value = new Date(Date.now() + 2592000000).toISOString().split('T')[0];
+            initGrid();
+            cargarDatos();
+            // Default 30 días para la fecha
+            document.getElementById('vencimiento').value = new Date(Date.now() + 2592000000).toISOString().split('T')[0];
         };
     </script>
 </body>
