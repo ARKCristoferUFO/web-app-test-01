@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planet Streaming - Panel Administrativo V3.1</title>
+    <title>Planet Streaming - Panel Administrativo V3.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght=400;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; }
         .status-green { color: #10b981; border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
         .status-yellow { color: #fbbf24; border-color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
@@ -121,6 +121,7 @@
 
         function initGrid() {
             const grid = document.getElementById('gridPlataformas');
+            grid.innerHTML = '';
             listaPlat.forEach(p => {
                 const btn = document.createElement('button');
                 btn.innerText = p;
@@ -136,10 +137,10 @@
             const btn = document.getElementById(`btn-${nombre.replace(/\s+/g, '-')}`);
             if (index === -1) {
                 carritoServicios.push({ nombre, correo: '', clave: '', perfil: '', pin: '' });
-                btn.classList.add('active');
+                if(btn) btn.classList.add('active');
             } else {
                 carritoServicios.splice(index, 1);
-                btn.classList.remove('active');
+                if(btn) btn.classList.remove('active');
             }
             actualizarFormularios();
         }
@@ -176,7 +177,7 @@
         async function guardarEnGoogle() {
             const btn = document.getElementById('btnGuardar');
             const nom = document.getElementById('nombre').value.toUpperCase().trim();
-            const tel = document.getElementById('telefono').value.trim(); // Captura el teléfono correctamente
+            const tel = document.getElementById('telefono').value.trim();
             
             if (!nom || carritoServicios.length === 0) return alert("Falta el nombre o seleccionar servicios.");
             
@@ -186,7 +187,7 @@
             const payload = {
                 id: Date.now().toString(),
                 nombre: nom,
-                telefono: tel, // Envía el teléfono capturado del input
+                telefono: tel,
                 servicio: carritoServicios.map(s => s.nombre).join(" + "),
                 costo: Number(document.getElementById('costo').value),
                 precio: Number(document.getElementById('precio').value),
@@ -198,7 +199,7 @@
             };
             try {
                 await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                alert("¡Venta registrada con éxito con su número de contacto!");
+                alert("¡Venta registrada con éxito!");
                 location.reload();
             } catch (e) {
                 btn.disabled = false;
@@ -210,26 +211,34 @@
             try {
                 const r = await fetch(API_URL + "?t=" + Date.now());
                 const res = await r.json();
+                
                 clientesGlobal = res.clientes || [];
                 historialGlobal = res.historial || [];
+                
                 document.getElementById('loader').style.display = 'none';
                 renderizarTabla();
             } catch (e) {
-                document.getElementById('loader').innerText = "Error de conexión.";
+                document.getElementById('loader').innerText = "Error de conexión con Google Sheets.";
+                console.error(e);
             }
         }
 
         function renderizarTabla() {
             const tabla = document.getElementById('cuerpoTabla');
             const buscar = document.getElementById('buscador').value.toLowerCase();
-            const hoy = new Date(); hoy.setHours(0,0,0,0);
+            
+            const hoy = new Date(); 
+            hoy.setHours(0,0,0,0);
             
             let vD=0, cD=0, uM=0, uA=0;
             
+            // Procesamiento seguro de finanzas desde el historial intocable
             historialGlobal.forEach(h => {
+                if (!h[1]) return;
                 const fReg = new Date(h[1]); 
                 const costo = Number(h[4]) || 0;
                 const precio = Number(h[5]) || 0;
+                
                 if (!isNaN(fReg.getTime())) {
                     if (fReg.toDateString() === hoy.toDateString()) { vD += precio; cD += costo; }
                     if (fReg.getMonth() === hoy.getMonth() && fReg.getFullYear() === hoy.getFullYear()) { uM += (precio - costo); }
@@ -237,84 +246,42 @@
                 }
             });
 
-            let filtrados = clientesGlobal.filter(c => c[1].toString().toLowerCase().includes(buscar) || c[3].toString().toLowerCase().includes(buscar));
+            // Filtrado seguro de Clientes Activos
+            let filtrados = clientesGlobal.filter(c => {
+                if (!c[1] || !c[3]) return false;
+                return c[1].toString().toLowerCase().includes(buscar) || c[3].toString().toLowerCase().includes(buscar);
+            });
+            
             let html = "";
             
             filtrados.forEach(c => {
-                const fVenc = procesarFecha(c[10]); fVenc.setHours(0,0,0,0);
+                // Lector de fecha ultra-resistente
+                const fVenc = procesarFecha(c[10]); 
+                fVenc.setHours(0,0,0,0);
+                
                 const diffTime = fVenc.getTime() - hoy.getTime();
                 const diasRestantes = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                let colorStatus = diasRestantes <= 0 ? "status-red" : (diasRestantes <= 3 ? "status-yellow" : "status-green");
+                
+                let colorStatus = "status-green";
+                let textoStatus = diasRestantes + ' DÍAS';
+                
+                if (diasRestantes <= 0) {
+                    colorStatus = "status-red";
+                    textoStatus = "VENCIDO";
+                } else if (diasRestantes <= 3) {
+                    colorStatus = "status-yellow";
+                    textoStatus = diasRestantes + ' DÍAS';
+                }
+                
+                const fechaMostrar = c[10] ? c[10].toString().split('T')[0] : '---';
                 
                 html += `<tr class="hover:bg-slate-800/20 transition-all">
-                    <td class="p-4"><div class="font-black text-blue-400 uppercase tracking-tighter">${c[1]}</div><div class="text-[9px] text-slate-500 font-bold">${c[3]}</div></td>
-                    <td class="p-4 text-center"><span class="px-3 py-1 rounded-full border text-[10px] font-black ${colorStatus}">${diasRestantes <= 0 ? 'VENCIDO' : diasRestantes + ' DÍAS'}</span></td>
-                    <td class="p-4 text-center font-mono text-slate-500">${c[10].toString().split('T')[0]}</td>
+                    <td class="p-4"><div class="font-black text-blue-400 uppercase tracking-tighter">${c[1] || '---'}</div><div class="text-[9px] text-slate-500 font-bold">${c[3] || '---'}</div></td>
+                    <td class="p-4 text-center"><span class="px-3 py-1 rounded-full border text-[10px] font-black ${colorStatus}">${textoStatus}</span></td>
+                    <td class="p-4 text-center font-mono text-slate-500">${fechaMostrar}</td>
                     <td class="p-4"><div class="flex flex-wrap gap-2 justify-center">
                         <button onclick="enviarMensaje('${c[0]}', 'datos')" class="bg-blue-600 px-3 py-1.5 rounded-lg font-black text-[9px] uppercase hover:bg-blue-500">Enviar Accesos</button>
                         <button onclick="enviarMensaje('${c[0]}', 3)" class="bg-yellow-500 text-black px-3 py-1.5 rounded-lg font-black text-[9px] uppercase hover:bg-yellow-400">Aviso 3D</button>
                         <button onclick="enviarMensaje('${c[0]}', 0)" class="bg-red-600 px-3 py-1.5 rounded-lg font-black text-[9px] uppercase hover:bg-red-500">Aviso 0D</button>
                     </div></td>
-                    <td class="p-4 text-right"><button onclick="eliminar('${c[0]}')" class="text-slate-700 hover:text-red-500 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button></td>
-                </tr>`;
-            });
-
-            tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center text-slate-600 italic">No hay registros activos</td></tr>';
-            
-            document.getElementById('gananciaDia').innerText = `$${vD.toFixed(2)}`;
-            document.getElementById('costoDia').innerText = `$${cD.toFixed(2)}`;
-            document.getElementById('netoDia').innerText = `$${(vD-cD).toFixed(2)}`;
-            document.getElementById('gananciaMes').innerText = `$${uM.toFixed(2)}`;
-            document.getElementById('gananciaAnio').innerText = `$${uA.toFixed(2)}`;
-        }
-
-        function enviarMensaje(id, tipo) {
-            const cliente = clientesGlobal.find(x => x[0].toString() === id.toString());
-            if (!cliente) return;
-
-            let num = cliente[2].toString().replace(/\D/g, '');
-            const sNames = cliente[3].toString().split(" + ");
-            const sCors = cliente[6].toString().split(" , ");
-            const sKeys = cliente[7].toString().split(" , ");
-            const sPerfs = cliente[8].toString().split(" , ");
-            const sPins = cliente[9].toString().split(" , ");
-            const fVenc = cliente[10].toString().split('T')[0];
-
-            let detalleSuscripciones = "";
-            sNames.forEach((s, i) => {
-                detalleSuscripciones += `📺 SERVICIO: *${s.trim()}*\n✉️ Usuario: *${(sCors[i] || sCors[0]).trim()}*\n🔑 Contraseña: *${(sKeys[i] || sKeys[0]).trim()}*\n👤 Perfil: *${(sPerfs[i] || sPerfs[0]).trim()}*\n🔐 PIN: *${(sPins[i] || sPins[0]).trim()}*\n🗓 Vence: *${fVenc}*\n------------------------------\n`;
-            });
-
-            let msj = "";
-            if (tipo === 'datos') {
-                msj = `🚀 *SERVICIOS ACTIVOS - ${cliente[1]}* ⭐\nGracias por preferir *Planet Streaming*\n\n${detalleSuscripciones}🚨 *REGLAS IMPORTANTES:*\n* No cambiar datos de la cuenta.\n* Usar solo el perfil asignado.\n* Disfruta tu programación 🍿.`;
-            } else if (tipo === 3) {
-                msj = `Hola *${cliente[1]}* 👋\n\nTe recordamos desde *Planet Streaming* que tu suscripción vence en *3 DÍAS*.\n\n${detalleSuscripciones}¿Deseas renovar para no perder tu perfil? 🍿`;
-            } else if (tipo === 0) {
-                msj = `⚠️ *¡AVISO DE VENCIMIENTO!* ⚠️\n\nHola *${cliente[1]}*, tu servicio en *Planet Streaming* vence el día de *HOY*.\n\n${detalleSuscripciones}Quedamos atentos a tu renovación para evitar el corte del servicio. ⏳🍿`;
-            }
-
-            window.open(`https://api.whatsapp.com/send?phone=${num}&text=${encodeURIComponent(msj)}`, "_blank");
-        }
-
-        async function eliminar(id) {
-            if (confirm("¿Seguro que deseas eliminar este cliente? Los accesos se borrarán pero tu historial financiero permanecerá seguro.")) {
-                await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', id: id }) });
-                location.reload();
-            }
-        }
-
-        function procesarFecha(v) {
-            if (!v) return new Date();
-            let s = v.toString().split("T")[0];
-            let p = s.split("-");
-            return p.length === 3 ? new Date(p[0], p[1]-1, p[2]) : new Date(v);
-        }
-
-        window.onload = () => {
-            initGrid(); cargarDatos();
-            document.getElementById('vencimiento').value = new Date(Date.now() + 2592000000).toISOString().split('T')[0];
-        };
-    </script>
-</body>
-</html>
+                    <td class="p-4 text-right"><button onclick="eliminar('${c[0]}')" class="text-slate-700 hover:text-
