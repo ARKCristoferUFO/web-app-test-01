@@ -108,7 +108,6 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxRFID-dOQuNJcC2b74GmpYXJ9Do6w5U0yQy89IPy1Y805owu__Xce3yRI9eDBnVpjz/exec";
         let clientesGlobal = [];
-        let historialGlobal = []; 
         let carritoServicios = []; 
 
         const listaPlat = [
@@ -210,8 +209,14 @@
                 const r = await fetch(API_URL + "?t=" + Date.now());
                 const res = await r.json();
                 
-                clientesGlobal = res.clientes || [];
-                historialGlobal = res.historial || [];
+                // CAMBIO CLAVE: Si los datos vienen directo como array o envueltos en .clientes, los agarra igual
+                if (Array.isArray(res)) {
+                    clientesGlobal = res;
+                } else if (res && res.clientes) {
+                    clientesGlobal = res.clientes;
+                } else {
+                    clientesGlobal = [];
+                }
                 
                 document.getElementById('loader').style.display = 'none';
                 renderizarTabla();
@@ -230,18 +235,18 @@
             
             let vD=0, cD=0, uM=0, uA=0;
             
-            historialGlobal.forEach(h => {
+            // CÁLCULO FINANCIERO ADAPTADO DIRECTAMENTE DE LOS DATOS ACTIVOS
+            clientesGlobal.forEach(h => {
                 if (!h[1]) return;
-                const fReg = new Date(h[1]); 
                 const costo = Number(h[4]) || 0;
                 const precio = Number(h[5]) || 0;
                 
-                if (!isNaN(fReg.getTime())) {
-                    if (fReg.toDateString() === hoy.toDateString()) { vD += precio; cD += costo; }
-                    if (fReg.getMonth() === hoy.getMonth() && fReg.getFullYear() === hoy.getFullYear()) { uM += (precio - costo); }
-                    if (fReg.getFullYear() === hoy.getFullYear()) { uA += (precio - costo); }
-                }
+                // Como los datos son en tiempo real, sumamos los totales del panel activo
+                vD += precio; 
+                cD += costo;
             });
+            uM = vD - cD; // Estimación directa de lo que tienes en pantalla
+            uA = vD - cD;
 
             let filtrados = clientesGlobal.filter(c => {
                 if (!c[1]) return false;
@@ -253,7 +258,6 @@
             let html = "";
             
             filtrados.forEach(c => {
-                // Modificación blindada para procesar cualquier formato de fecha sin colgarse
                 const fVenc = procesarFecha(c[10]); 
                 fVenc.setHours(0,0,0,0);
                 
@@ -336,7 +340,6 @@
 
         function procesarFecha(v) {
             if (!v) return new Date();
-            // Soporta objetos Date nativos o cadenas de texto con guiones/barras
             if (v instanceof Date) return v;
             let s = v.toString().split("T")[0].trim();
             let p = s.split("-");
@@ -345,7 +348,6 @@
             }
             p = s.split("/");
             if (p.length === 3) {
-                // Detecta si es DD/MM/AAAA o AAAA/MM/DD
                 if (p[0].length === 4) {
                     return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
                 } else {
