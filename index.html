@@ -15,8 +15,6 @@
         .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        .cart-item { animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="pb-10">
@@ -154,7 +152,7 @@
             contenedor.innerHTML = '';
             carritoServicios.forEach((serv, i) => {
                 const div = document.createElement('div');
-                div.className = "cart-item bg-slate-950 p-4 rounded-2xl border border-blue-600/20 space-y-2 relative";
+                div.className = "bg-slate-950 p-4 rounded-2xl border border-blue-600/20 space-y-2 relative";
                 div.innerHTML = `
                     <div class="flex justify-between items-center mb-2">
                         <p class="text-blue-500 font-black text-[9px] uppercase tracking-widest">${serv.nombre}</p>
@@ -255,6 +253,7 @@
             let html = "";
             
             filtrados.forEach(c => {
+                // Modificación blindada para procesar cualquier formato de fecha sin colgarse
                 const fVenc = procesarFecha(c[10]); 
                 fVenc.setHours(0,0,0,0);
                 
@@ -337,16 +336,24 @@
 
         function procesarFecha(v) {
             if (!v) return new Date();
-            let s = v.toString().split("T")[0];
+            // Soporta objetos Date nativos o cadenas de texto con guiones/barras
+            if (v instanceof Date) return v;
+            let s = v.toString().split("T")[0].trim();
             let p = s.split("-");
             if (p.length === 3) {
-                return new Date(p[0], p[1] - 1, p[2]);
+                return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
             }
             p = s.split("/");
             if (p.length === 3) {
-                return new Date(p[2], p[1] - 1, p[0]);
+                // Detecta si es DD/MM/AAAA o AAAA/MM/DD
+                if (p[0].length === 4) {
+                    return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
+                } else {
+                    return new Date(parseInt(p[2]), parseInt(p[1]) - 1, parseInt(p[0]));
+                }
             }
-            return new Date(v);
+            let parseoDirecto = new Date(v);
+            return isNaN(parseoDirecto.getTime()) ? new Date() : parseoDirecto;
         }
 
         window.onload = () => {
