@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planet Streaming - Panel Administrativo V2</title>
+    <title>Planet Streaming - Panel Administrativo V3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
@@ -110,6 +110,7 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxRFID-dOQuNJcC2b74GmpYXJ9Do6w5U0yQy89IPy1Y805owu__Xce3yRI9eDBnVpjz/exec";
         let clientesGlobal = [];
+        let historialGlobal = []; // Nueva lista para almacenar el dinero histórico
         let carritoServicios = []; 
 
         const listaPlat = [
@@ -204,7 +205,12 @@
         async function cargarDatos() {
             try {
                 const r = await fetch(API_URL + "?t=" + Date.now());
-                clientesGlobal = await r.json();
+                const res = await r.json();
+                
+                // Separamos la respuesta en sus dos listas correspondientes
+                clientesGlobal = res.clientes || [];
+                historialGlobal = res.historial || [];
+                
                 document.getElementById('loader').style.display = 'none';
                 renderizarTabla();
             } catch (e) {
@@ -216,22 +222,44 @@
             const tabla = document.getElementById('cuerpoTabla');
             const buscar = document.getElementById('buscador').value.toLowerCase();
             const hoy = new Date(); hoy.setHours(0,0,0,0);
+            
+            // 1. CÁLCULO DE GRÁFICOS USANDO LA PESTAÑA DE HISTORIAL_VENTAS (Blindado contra borrados)
             let vD=0, cD=0, uM=0, uA=0;
+            
+            historialGlobal.forEach(h => {
+                // h[0] = ID, h[1] = Fecha String, h[4] = Costo, h[5] = Precio
+                const fReg = new Date(h[1]); 
+                const costo = Number(h[4]) || 0;
+                const precio = Number(h[5]) || 0;
+
+                if (!isNaN(fReg.getTime())) {
+                    // Hoy
+                    if (fReg.toDateString() === hoy.toDateString()) { 
+                        vD += precio; 
+                        cD += costo; 
+                    }
+                    // Mes Actual (Mayo 2026)
+                    if (fReg.getMonth() === hoy.getMonth() && fReg.getFullYear() === hoy.getFullYear()) { 
+                        uM += (precio - costo); 
+                    }
+                    // Año Actual (2026)
+                    if (fReg.getFullYear() === hoy.getFullYear()) { 
+                        uA += (precio - costo); 
+                    }
+                }
+            });
+
+            // 2. RENDERIZAR TABLA DE CLIENTES ACTIVOS (Usa la pestaña Base_Streaming)
             let filtrados = clientesGlobal.filter(c => c[1].toString().toLowerCase().includes(buscar) || c[3].toString().toLowerCase().includes(buscar));
             let html = "";
+            
             filtrados.forEach(c => {
                 const fVenc = procesarFecha(c[10]); fVenc.setHours(0,0,0,0);
                 const diffTime = fVenc.getTime() - hoy.getTime();
                 const diasRestantes = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                const fReg = new Date(parseInt(c[0]));
-                const costo = Number(c[4]) || 0;
-                const precio = Number(c[5]) || 0;
-                if (!isNaN(fReg.getTime())) {
-                    if (fReg.toDateString() === hoy.toDateString()) { vD += precio; cD += costo; }
-                    if (fReg.getMonth() === hoy.getMonth() && fReg.getFullYear() === 2026) uM += (precio-costo);
-                    if (fReg.getFullYear() === 2026) uA += (precio-costo);
-                }
+                
                 let colorStatus = diasRestantes <= 0 ? "status-red" : (diasRestantes <= 3 ? "status-yellow" : "status-green");
+                
                 html += `<tr class="hover:bg-slate-800/20 transition-all">
                     <td class="p-4"><div class="font-black text-blue-400 uppercase tracking-tighter">${c[1]}</div><div class="text-[9px] text-slate-500 font-bold">${c[3]}</div></td>
                     <td class="p-4 text-center"><span class="px-3 py-1 rounded-full border text-[10px] font-black ${colorStatus}">${diasRestantes <= 0 ? 'VENCIDO' : diasRestantes + ' DÍAS'}</span></td>
@@ -244,7 +272,10 @@
                     <td class="p-4 text-right"><button onclick="eliminar('${c[0]}')" class="text-slate-700 hover:text-red-500 transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button></td>
                 </tr>`;
             });
-            tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center text-slate-600 italic">No hay registros</td></tr>';
+
+            tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center text-slate-600 italic">No hay registros activos</td></tr>';
+            
+            // Asignación de los totales calculados desde el historial intocable
             document.getElementById('gananciaDia').innerText = `$${vD.toFixed(2)}`;
             document.getElementById('costoDia').innerText = `$${cD.toFixed(2)}`;
             document.getElementById('netoDia').innerText = `$${(vD-cD).toFixed(2)}`;
@@ -252,7 +283,6 @@
             document.getElementById('gananciaAnio').innerText = `$${uA.toFixed(2)}`;
         }
 
-        // --- FUNCIÓN DE MENSAJERÍA ACTUALIZADA ---
         function enviarMensaje(id, tipo) {
             const cliente = clientesGlobal.find(x => x[0].toString() === id.toString());
             if (!cliente) return;
@@ -272,7 +302,6 @@
 
             let msj = "";
             if (tipo === 'datos') {
-                // Formato exacto solicitado
                 msj = `🚀 *SERVICIOS ACTIVOS - ${cliente[1]}* ⭐\nGracias por preferir *Planet Streaming*\n\n${detalleSuscripciones}🚨 *REGLAS IMPORTANTES:*\n* No cambiar datos de la cuenta.\n* Usar solo el perfil asignado.\n* Disfruta tu programación 🍿.`;
             } else if (tipo === 3) {
                 msj = `Hola *${cliente[1]}* 👋\n\nTe recordamos desde *Planet Streaming* que tu suscripción vence en *3 DÍAS*.\n\n${detalleSuscripciones}¿Deseas renovar para no perder tu perfil? 🍿`;
@@ -284,7 +313,7 @@
         }
 
         async function eliminar(id) {
-            if (confirm("¿Seguro que deseas eliminar este cliente?")) {
+            if (confirm("¿Seguro que deseas eliminar este cliente? Los accesos se borrarán pero tu historial financiero permanecerá seguro.")) {
                 await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', id: id }) });
                 location.reload();
             }
