@@ -106,19 +106,22 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbxRFID-dOQuNJcC2b74GmpYXJ9Do6w5U0yQy89IPy1Y805owu__Xce3yRI9eDBnVpjz/exec";
         let clientesGlobal = [];
 
+        // Descarga inicial de la información remota
         async function cargarDatos() {
             try {
-                console.log("Conectando con Google Sheets remetamente...");
+                console.log("Iniciando descarga de datos desde Google Sheets...");
                 const res = await fetch(API_URL);
                 const json = await res.json();
                 clientesGlobal = json.clientes || []; 
+                console.log("Datos recibidos con éxito. Cantidad de filas:", clientesGlobal.length);
                 renderizarTabla();
             } catch(e) { 
-                console.error("Error de conexión:", e); 
-                document.getElementById('cuerpoTabla').innerHTML = '<tr><td colspan="5" class="p-10 text-center text-red-500 font-black">❌ ERROR AL CONECTAR CON GOOGLE SHEETS<br><span class="text-[9px] text-slate-500 font-normal">Revisa los permisos de ejecución en tu Apps Script</span></td></tr>';
+                console.error("Error crítico en cargarDatos:", e); 
+                document.getElementById('cuerpoTabla').innerHTML = '<tr><td colspan="5" class="p-10 text-center text-red-500 font-black">❌ ERROR AL CONECTAR CON GOOGLE SHEETS<br><span class="text-[9px] text-slate-500 font-normal">Verifica la URL de tu Apps Script o tu conexión</span></td></tr>';
             }
         }
 
+        // Formateador y normalizador de fechas
         function procesarFecha(valor) {
             if (!valor) return new Date(0);
             if (!isNaN(valor) && typeof valor !== 'string') return new Date((valor - 25569) * 86400 * 1000);
@@ -131,6 +134,7 @@
             return new Date(valor);
         }
 
+        // Construcción de la tabla
         function renderizarTabla() {
             try {
                 const tabla = document.getElementById('cuerpoTabla');
@@ -138,7 +142,7 @@
                 const hoy = new Date(); hoy.setHours(0,0,0,0);
                 let vDia = 0, cDia = 0, uMes = 0, uAnio = 0;
 
-                // Filtro de protección contra celdas corruptas o vacías
+                // FILTRO BLINDADO: Ignora filas corruptas o vacías
                 let filtrados = clientesGlobal.filter(c => 
                     c && Array.isArray(c) && c.length >= 4 && c[1] && c[3] &&
                     (c[1].toString().toLowerCase().includes(busqueda) || c[3].toString().toLowerCase().includes(busqueda))
@@ -190,11 +194,12 @@
                 document.getElementById('gananciaAnio').innerText = `$${uAnio.toFixed(2)}`;
 
             } catch (error) {
-                console.error("Error render:", error);
-                document.getElementById('cuerpoTabla').innerHTML = '<tr><td colspan="5" class="p-10 text-center text-red-400">Error interno al procesar visualización</td></tr>';
+                console.error("Error al renderizar la tabla:", error);
+                document.getElementById('cuerpoTabla').innerHTML = '<tr><td colspan="5" class="p-10 text-center text-red-400">Error interno al procesar las filas</td></tr>';
             }
         }
 
+        // Envío a Google Sheets
         async function guardarEnGoogle() {
             const btn = document.getElementById('btnGuardar');
             const data = {
@@ -222,13 +227,14 @@
                 await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
                 location.reload();
             } catch(err) {
-                alert("Error al guardar en la base de datos.");
+                alert("Error al guardar. Verifica la consola.");
                 console.error(err);
                 btn.innerText = "Guardar Registro";
                 btn.disabled = false;
             }
         }
 
+        // Renovación
         async function renovar(id) {
             if(!confirm("¿Deseas registrar la renovación de este servicio?")) return;
             try {
@@ -237,6 +243,7 @@
             } catch(err) { console.error(err); }
         }
 
+        // Eliminación
         async function eliminar(id) {
             if(!confirm("¿Seguro que deseas eliminar permanentemente este registro?")) return;
             try {
@@ -245,6 +252,7 @@
             } catch(err) { console.error(err); }
         }
 
+        // Plantilla de Entrega
         function wsAcceso(id) {
             const c = clientesGlobal.find(x => x[0] == id);
             if(!c) return;
@@ -265,16 +273,20 @@
             const r3 = "* Disfruta tu programación 🍿";
 
             const msj = l1 + "\n" + l2 + "\n\n" + sep + "\n" + l3 + "\n" + l4 + "\n" + l5 + "\n" + l6 + "\n" + l7 + "\n" + l8 + "\n" + sep + "\n\n" + l9 + "\n" + r1 + "\n" + r2 + "\n" + r3;
+            
             abrirWS(c[2], msj);
         }
 
+        // Plantilla de Cobro Dinámica
         function wsCobro(id) {
             const c = clientesGlobal.find(x => x[0] == id);
             if(!c) return;
             
-            const hoy = new Date(); hoy.setHours(0,0,0,0);
+            const hoy = new Date(); 
+            hoy.setHours(0,0,0,0);
             const fechaV = procesarFecha(c[10]);
             const fechaTxt = isNaN(fechaV.getTime()) || fechaV.getTime() === 0 ? 'Pendiente' : fechaV.toISOString().split('T')[0];
+            
             const diff = fechaV.getTime() - hoy.getTime();
             const dias = Math.ceil(diff / (1000 * 60 * 60 * 24));
             
@@ -287,6 +299,7 @@
                                "🗓️ Vence: " + fechaTxt;
             
             let msj = "";
+
             if (dias <= 0) {
                 msj = "⚠️ ¡AVISO DE VENCIMIENTO! ⚠️\n\n" +
                       "Hola " + c[1] + ", tu servicio en Planet Streaming vence el día de HOY.\n\n" +
@@ -301,15 +314,18 @@
                       sep + "\n" +
                       "¿Deseas renovar para no perder tu perfil?";
             }
+            
             abrirWS(c[2], msj);
         }
 
+        // Apertura en WhatsApp
         function abrirWS(tel, msj) {
             const fTel = tel.toString().replace(/\D/g, '');
             const msjFinal = encodeURIComponent(msj);
             window.open("https://api.whatsapp.com/send?phone=" + fTel + "&text=" + msjFinal, "_blank");
         }
 
+        // Inicialización automática
         window.onload = cargarDatos;
     </script>
 </body>
