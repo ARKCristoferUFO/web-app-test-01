@@ -110,7 +110,6 @@
             try {
                 const res = await fetch(API_URL);
                 const json = await res.json();
-                // Como tu nuevo Apps Script manda un objeto {clientes: [...], historial: [...]}, mapeamos la propiedad correcta
                 clientesGlobal = json.clientes || []; 
                 renderizarTabla();
             } catch(e) { 
@@ -265,8 +264,25 @@
         function wsCobro(id) {
             const c = clientesGlobal.find(x => x[0] == id);
             if(!c) return;
-            const fechaV = isNaN(procesarFecha(c[10]).getTime()) ? 'Pendiente' : procesarFecha(c[10]).toISOString().split('T')[0];
-            const msj = "Hola *" + c[1] + "*, te saludamos de *Streaming Planet*. Tu servicio de *" + c[3] + "* vence el (" + fechaV + "). 📅 ¿Deseas renovar tu pantalla?";
+            
+            const hoy = new Date(); 
+            hoy.setHours(0,0,0,0);
+            const fechaV = procesarFecha(c[10]);
+            const fechaTxt = isNaN(fechaV.getTime()) || fechaV.getTime() === 0 ? 'Pendiente' : fechaV.toISOString().split('T')[0];
+            
+            const diff = fechaV.getTime() - hoy.getTime();
+            const dias = Math.ceil(diff / (1000 * 60 * 60 * 24));
+            
+            let msj = "";
+
+            if (dias <= 0) {
+                msj = "Hola *" + c[1] + "*, te saludamos de *Streaming Planet*. 👋 Te recordamos que tu servicio de *" + c[3] + "* se encuentra *VENCIDO* desde el (" + fechaTxt + "). 🚨 ¿Deseas renovar tu pantalla para reactivar tu acceso y no perder tu perfil?";
+            } else if (dias <= 3) {
+                msj = "Hola *" + c[1] + "*, te saludamos de *Streaming Planet*. 👋 Te escribimos para notificarte que tu servicio de *" + c[3] + "* está próximo a vencer en *" + dias + " días* (" + fechaTxt + "). ⏳ ¿Deseas renovar con tiempo para mantener tu mismo perfil e historial?";
+            } else {
+                msj = "Hola *" + c[1] + "*, te saludamos de *Streaming Planet*. 👋 Tu servicio de *" + c[3] + "* vence el (" + fechaTxt + "). 📅 ¿Deseas renovar tu pantalla con anticipación?";
+            }
+            
             abrirWS(c[2], msj);
         }
 
