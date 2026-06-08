@@ -1,5 +1,5 @@
 // 1. REEMPLAZA ESTA URL CON TU URL REAL DE GOOGLE APPS SCRIPT (LA QUE TERMINA EN /exec)
-const API_URL = "TU_URL_DE_APPS_SCRIPT_AQUI"; 
+const API_URL = "https://script.google.com/macros/s/AKfycbxRFID-dOQuNJcC2b74GmpYXJ9Do6w5U0yQy89IPy1Y805owu__Xce3yRI9eDBnVpjz/exec";
 
 let clientesGlobal = [];
 
