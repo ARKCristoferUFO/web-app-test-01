@@ -273,31 +273,14 @@
             const diff = fechaV.getTime() - hoy.getTime();
             const dias = Math.ceil(diff / (1000 * 60 * 60 * 24));
             
-            const sep = "------------------------------";
-            const infoCuenta = "📺 *SERVICIO:* " + c[3] + "\n" +
-                               "✉️ *Usuario:* " + (c[6] || 'No asignado') + "\n" +
-                               "🔑 *Contraseña:* " + (c[7] || 'No asignada') + "\n" +
-                               "👤 *Perfil:* " + (c[8] || 'No asignado') + "\n" +
-                               "🔐 *PIN:* " + (c[9] || 'No') + "\n" +
-                               "🗓️ *Vence:* " + fechaTxt;
-            
             let msj = "";
 
             if (dias <= 0) {
-                // Formato Obligado: Día de renovación o vencido
-                msj = "⚠️ *¡AVISO DE VENCIMIENTO!* ⚠️\n\n" +
-                      "Hola *" + c[1] + "*, tu servicio en *Planet Streaming* vence el día de *HOY*.\n\n" +
-                      infoCuenta + "\n" +
-                      sep + "\n" +
-                      "Quedamos atentos a tu renovación para evitar el corte del servicio. ⏳🍿";
+                msj = "Hola *" + c[1] + "*, te saludamos de *Streaming Planet*. 👋 Te recordamos que tu servicio de *" + c[3] + "* se encuentra *VENCIDO* desde el (" + fechaTxt + "). 🚨 ¿Deseas renovar tu pantalla para reactivar tu acceso y no perder tu perfil?";
+            } else if (dias <= 3) {
+                msj = "Hola *" + c[1] + "*, te saludamos de *Streaming Planet*. 👋 Te escribimos para notificarte que tu servicio de *" + c[3] + "* está próximo a vencer en *" + dias + " días* (" + fechaTxt + "). ⏳ ¿Deseas renovar con tiempo para mantener tu mismo perfil e historial?";
             } else {
-                // Formato Recordatorio: 3 días o más antes del vencimiento
-                const textoDias = dias === 1 ? "1 DÍA" : dias + " DÍAS";
-                msj = "Hola *" + c[1] + "* 👋\n\n" +
-                      "Te recordamos desde *Planet Streaming* que tu suscripción vence en *" + textoDias + "*.\n\n" +
-                      infoCuenta + "\n" +
-                      sep + "\n" +
-                      "¿Deseas renovar para no perder tu perfil?";
+                msj = "Hola *" + c[1] + "*, te saludamos de *Streaming Planet*. 👋 Tu servicio de *" + c[3] + "* vence el (" + fechaTxt + "). 📅 ¿Deseas renovar tu pantalla con anticipación?";
             }
             
             abrirWS(c[2], msj);
