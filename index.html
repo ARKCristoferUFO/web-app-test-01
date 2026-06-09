@@ -43,7 +43,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div class="lg:col-span-1 bg-slate-900 p-5 rounded-2xl border border-slate-800 h-fit shadow-xl">
-                <h2 class="text-blue-400 font-bold mb-4 uppercase tracking-widest text-[10px]">Nuevo Registro Múltiple</h2>
+                <h2 class="text-blue-400 font-bold mb-4 uppercase tracking-widest text-[10px]">Nuevo Registro Múltiple / Lotes</h2>
                 <div class="space-y-3">
                     <input id="nombre" type="text" placeholder="NOMBRE CLIENTE" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-bold uppercase text-white outline-none">
                     <input id="telefono" type="text" placeholder="WHATSAPP (Ej: 58...)" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 text-white outline-none">
@@ -51,56 +51,65 @@
                     
                     <div class="border border-slate-800 p-3 rounded-xl bg-slate-950/50 space-y-2">
                         <p class="text-[9px] text-blue-400 font-black uppercase">Configurar Plataforma</p>
-                        <select id="servicio" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 font-bold text-white text-[10px]">
-                            <option>NETFLIX</option>
-                            <option>DISNEY+ PREMIUM</option>
-                            <option>DISNEY+ STANDARD</option>
-                            <option>MAX</option>
-                            <option>PRIME VIDEO</option>
-                            <option>PARAMOUNT+</option>
-                            <option>UNIVERSAL PLUS</option>
-                            <option>APPLE TV</option>
-                            <option>CRUNCHYROLL</option>
-                            <option>VIKI RAKUTEN</option>
-                            <option>VIX</option>
-                            <option>TELELATINO</option>
-                            <option>OLEADA TV</option>
-                            <option>MEGA TV</option>
-                            <option>MAGIS TV</option>
-                            <option>IPTV</option>
-                            <option>YOUTUBE</option>
-                            <option>SPOTIFY</option>
-                            <option>DEEZER</option>
-                            <option>CANVA PRO</option>
-                            <option>CAPCUT PRO</option>
-                            <option>ADOBE CLOUD</option>
-                            <option>LICENCIA OFFICE</option>
-                            <option>CHAT GPT</option>
-                            <option>GEMINI PRO</option>
-                            <option>DUOLINGO</option>
-                            <option>PORN HUB</option>
-                        </select>
-                        <div class="grid grid-cols-2 gap-2">
-                            <input id="costo" type="number" step="0.01" placeholder="Costo $" class="bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-[10px]">
-                            <input id="precio" type="number" step="0.01" placeholder="Venta $" class="bg-slate-800 border border-slate-700 rounded-lg p-2 font-bold text-green-400 text-[10px]">
+                        
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="col-span-2">
+                                <select id="servicio" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 font-bold text-white text-[10px]">
+                                    <option>NETFLIX</option>
+                                    <option>DISNEY+ PREMIUM</option>
+                                    <option>DISNEY+ STANDARD</option>
+                                    <option>MAX</option>
+                                    <option>PRIME VIDEO</option>
+                                    <option>PARAMOUNT+</option>
+                                    <option>UNIVERSAL PLUS</option>
+                                    <option>APPLE TV</option>
+                                    <option>CRUNCHYROLL</option>
+                                    <option>VIKI RAKUTEN</option>
+                                    <option>VIX</option>
+                                    <option>TELELATINO</option>
+                                    <option>OLEADA TV</option>
+                                    <option>MEGA TV</option>
+                                    <option>MAGIS TV</option>
+                                    <option>IPTV</option>
+                                    <option>YOUTUBE</option>
+                                    <option>SPOTIFY</option>
+                                    <option>DEEZER</option>
+                                    <option>CANVA PRO</option>
+                                    <option>CAPCUT PRO</option>
+                                    <option>ADOBE CLOUD</option>
+                                    <option>LICENCIA OFFICE</option>
+                                    <option>CHAT GPT</option>
+                                    <option>GEMINI PRO</option>
+                                    <option>DUOLINGO</option>
+                                    <option>PORN HUB</option>
+                                </select>
+                            </div>
+                            <div>
+                                <input id="cantidad" type="number" min="1" value="1" onchange="generarCamposCredenciales()" onkeyup="generarCamposCredenciales()" placeholder="Cant." class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-center text-white font-black text-[10px]">
+                            </div>
                         </div>
-                        <input id="correo" type="text" placeholder="Usuario / Correo" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-[10px] outline-none">
-                        <input id="clave" type="text" placeholder="Contraseña" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-[10px] outline-none">
+
                         <div class="grid grid-cols-2 gap-2">
-                            <input id="perfil" type="text" placeholder="Perfil" class="bg-slate-800 p-2 rounded border border-slate-700 text-[10px] text-white">
-                            <input id="pin" type="text" placeholder="PIN" class="bg-slate-800 p-2 rounded border border-slate-700 text-[10px] text-white">
+                            <input id="costo" type="number" step="0.01" placeholder="Costo Unitario $" class="bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-[10px]">
+                            <input id="precio" type="number" step="0.01" placeholder="Venta Unitaria $" class="bg-slate-800 border border-slate-700 rounded-lg p-2 font-bold text-green-400 text-[10px]">
                         </div>
-                        <button type="button" onclick="agregarAlCarrito()" class="w-full bg-slate-800 hover:bg-slate-700 text-blue-400 font-black py-1.5 rounded-lg border border-slate-700 uppercase tracking-wider text-[9px] mt-1 transition-all">➕ Añadir Servicio</button>
+
+                        <input id="correo" type="text" placeholder="Usuario Base / Correo" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-[10px] outline-none">
+                        
+                        <div id="contenedorCredencialesDinamicas" class="space-y-2 pt-1 max-h-[220px] overflow-y-auto pr-1">
+                            </div>
+
+                        <button type="button" onclick="agregarAlCarrito()" class="w-full bg-slate-800 hover:bg-slate-700 text-blue-400 font-black py-1.5 rounded-lg border border-slate-700 uppercase tracking-wider text-[9px] mt-2 transition-all">➕ Añadir al Carrito</button>
                     </div>
 
                     <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                        <p class="text-[9px] text-slate-400 font-black uppercase mb-2">Servicios en el Carrito (<span id="cuentaCarrito">0</span>)</p>
+                        <p class="text-[9px] text-slate-400 font-black uppercase mb-2">Resumen del Carrito (<span id="cuentaCarrito">0</span> Cuentas)</p>
                         <div id="listaCarrito" class="space-y-1.5 max-h-[150px] overflow-y-auto pr-1 text-slate-400 italic text-[10px]">
                             Ningún servicio añadido aún.
                         </div>
                     </div>
 
-                    <button onclick="guardarEnGoogle()" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-500 font-black py-3 rounded-xl uppercase shadow-lg tracking-widest text-[12px]">Guardar Registro</button>
+                    <button onclick="guardarEnGoogle()" id="btnGuardar" class="w-full bg-blue-600 hover:bg-blue-500 font-black py-3 rounded-xl uppercase shadow-lg tracking-widest text-[12px]">Guardar Todo el Lote</button>
                 </div>
             </div>
 
@@ -112,7 +121,7 @@
                     <table class="w-full text-left">
                         <thead class="bg-slate-950 text-slate-500 uppercase text-[9px] tracking-widest sticky top-0">
                             <tr>
-                                <th class="p-4">Cliente / Servicio</th>
+                                <th class="p-4">Cliente / Servicios Registrados</th>
                                 <th class="p-4 text-center">Estado</th>
                                 <th class="p-4 text-center">Vence</th>
                                 <th class="p-4 text-center">Acciones</th>
@@ -131,7 +140,7 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbxRFID-dOQuNJcC2b74GmpYXJ9Do6w5U0yQy89IPy1Y805owu__Xce3yRI9eDBnVpjz/exec";
         let clientesGlobal = [];
-        let carritoServicios = []; // Array temporal del carrito
+        let carritoServicios = []; 
 
         async function cargarDatos() {
             try {
@@ -153,31 +162,75 @@
             return new Date(valor);
         }
 
+        // Genera subcampos dinámicamente según la cantidad especificada
+        function generarCamposCredenciales() {
+            const contenedor = document.getElementById('contenedorCredencialesDinamicas');
+            const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
+            
+            if (cantidad < 1) return;
+            
+            let html = "";
+            for (let i = 1; i <= cantidad; i++) {
+                html += `
+                    <div class="bg-slate-900/90 p-2 rounded-lg border border-slate-700/60 space-y-1.5 relative">
+                        <span class="absolute top-1 right-2 text-[8px] text-slate-500 font-black">N° ${i}</span>
+                        <input type="text" placeholder="Contraseña Cuenta ${i}" class="clave-dinamica w-full bg-slate-800 border border-slate-700 rounded p-1 text-white text-[10px] outline-none">
+                        <div class="grid grid-cols-2 gap-1.5">
+                            <input type="text" placeholder="Perfil" class="perfil-dinamica bg-slate-800 p-1 rounded border border-slate-700 text-[10px] text-white">
+                            <input type="text" placeholder="PIN" class="pin-dinamica bg-slate-800 p-1 rounded border border-slate-700 text-[10px] text-white">
+                        </div>
+                    </div>
+                `;
+            }
+            contenedor.innerHTML = html;
+        }
+
         function agregarAlCarrito() {
             const servicio = document.getElementById('servicio').value;
-            const costo = parseFloat(document.getElementById('costo').value) || 0;
-            const precio = parseFloat(document.getElementById('precio').value) || 0;
-            const correo = document.getElementById('correo').value.trim();
-            const clave = document.getElementById('clave').value.trim();
-            const perfil = document.getElementById('perfil').value.trim() || 'N/A';
-            const pin = document.getElementById('pin').value.trim() || 'N/A';
+            const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
+            const costoUnitario = parseFloat(document.getElementById('costo').value) || 0;
+            const precioUnitario = parseFloat(document.getElementById('precio').value) || 0;
+            const correoBase = document.getElementById('correo').value.trim();
 
-            if (!correo || !clave) {
-                alert("Por favor ingresa el Usuario y Contraseña de la plataforma.");
+            if (!correoBase) {
+                alert("Por favor ingresa el Usuario o Correo electrónico base.");
                 return;
             }
 
-            // Añadir objeto estructurado al carrito
-            carritoServicios.push({ servicio, costo, precio, correo, clave, perfil, pin });
+            const inputsClave = document.querySelectorAll('.clave-dinamica');
+            const inputsPerfil = document.querySelectorAll('.perfil-dinamica');
+            const inputsPin = document.querySelectorAll('.pin-dinamica');
+
+            // Insertamos cada una de las unidades especificadas al carrito global de forma ordenada
+            for (let i = 0; i < cantidad; i++) {
+                const clave = inputsClave[i] ? inputsClave[i].value.trim() : "";
+                const perfil = (inputsPerfil[i] && inputsPerfil[i].value.trim()) ? inputsPerfil[i].value.trim() : 'N/A';
+                const pin = (inputsPin[i] && inputsPin[i].value.trim()) ? inputsPin[i].value.trim() : 'N/A';
+
+                if (!clave) {
+                    alert(`Falta rellenar la contraseña para la cuenta número ${i + 1}`);
+                    return;
+                }
+
+                carritoServicios.push({
+                    servicio: servicio,
+                    costo: costoUnitario,
+                    precio: precioUnitario,
+                    correo: correoBase,
+                    clave: clave,
+                    perfil: perfil,
+                    pin: pin
+                });
+            }
+
             actualizarVistaCarrito();
 
-            // Limpiar campos específicos de la cuenta procesada
+            // Limpiar campos de configuración limpios
+            document.getElementById('cantidad').value = 1;
             document.getElementById('costo').value = '';
             document.getElementById('precio').value = '';
             document.getElementById('correo').value = '';
-            document.getElementById('clave').value = '';
-            document.getElementById('perfil').value = '';
-            document.getElementById('pin').value = '';
+            generarCamposCredenciales();
         }
 
         function quitarDelCarrito(index) {
@@ -201,7 +254,7 @@
                     <div class="flex justify-between items-center bg-slate-800/60 p-1.5 rounded border border-slate-700/50 font-bold text-white uppercase text-[10px]">
                         <div>
                             <span class="text-blue-400">${item.servicio}</span> 
-                            <span class="text-slate-400 text-[9px] font-normal">(${item.correo})</span>
+                            <span class="text-slate-400 text-[9px] font-normal">(${item.perfil})</span>
                         </div>
                         <div class="flex items-center space-x-2">
                             <span class="text-green-400">$${item.precio.toFixed(2)}</span>
@@ -286,7 +339,7 @@
                 return;
             }
 
-            // Agrupar datos del carrito en strings unificados para mantener la misma fila en Sheets
+            // Agrupación limpia para enviarle los datos consolidados a la hoja de Google Sheets
             let listaNombresApps = [];
             let totalCosto = 0;
             let totalPrecio = 0;
@@ -295,6 +348,7 @@
             let listaPerfiles = [];
             let listaPins = [];
 
+            // Mapeamos el carrito
             carritoServicios.forEach(item => {
                 listaNombresApps.push(item.servicio);
                 totalCosto += item.costo;
@@ -309,10 +363,10 @@
                 id: Date.now(),
                 nombre: nombre,
                 telefono: telefono,
-                servicio: listaNombresApps.join(" + "), // Ej: NETFLIX + MAX
+                servicio: listaNombresApps.join(" + "), 
                 costo: totalCosto,
                 precio: totalPrecio,
-                correo: listaCorreos.join(" | "), // Separados por barra limpia
+                correo: listaCorreos.join(" | "), 
                 clave: listaClaves.join(" | "),
                 perfil: listaPerfiles.join(" | "),
                 pin: listaPins.join(" | "),
@@ -340,7 +394,6 @@
             const c = clientesGlobal.find(x => x[0] == id);
             const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
             
-            // Separar de nuevo las cuentas acumuladas para armar el mensaje agrupado
             const apps = c[3].toString().split(" + ");
             const correos = c[6].toString().split(" | ");
             const claves = c[7].toString().split(" | ");
@@ -348,11 +401,10 @@
             const pins = c[9].toString().split(" | ");
 
             let msj = `🚀 *SERVICIOS ACTIVOS - ${c[1]}* ⭐\n`;
-            msj += `Gracias por tu compra en planet streaming\n\n`;
+            msj += `Gracias por tu compra en Streaming Planet\n\n`;
             
             const sep = "------------------------------";
 
-            // Iterar y renderizar dinámicamente cada plataforma en el mismo mensaje
             apps.forEach((app, index) => {
                 msj += `${sep}\n`;
                 msj += `📺 *SERVICIO:* ${app}\n`;
@@ -384,7 +436,10 @@
             window.open("https://api.whatsapp.com/send?phone=" + fTel + "&text=" + msjFinal, "_blank");
         }
 
-        window.onload = cargarDatos;
+        window.onload = function() {
+            cargarDatos();
+            generarCamposCredenciales(); // Ejecución inicial
+        };
     </script>
 </body>
 </html>
