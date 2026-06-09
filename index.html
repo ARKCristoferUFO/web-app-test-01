@@ -96,8 +96,7 @@
 
                         <input id="correo" type="text" placeholder="Usuario Base / Correo" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-white text-[10px] outline-none">
                         
-                        <div id="contenedorCredencialesDinamicas" class="space-y-2 pt-1 max-h-[220px] overflow-y-auto pr-1">
-                            </div>
+                        <div id="contenedorCredencialesDinamicas" class="space-y-2 pt-1 max-h-[220px] overflow-y-auto pr-1"></div>
 
                         <button type="button" onclick="agregarAlCarrito()" class="w-full bg-slate-800 hover:bg-slate-700 text-blue-400 font-black py-1.5 rounded-lg border border-slate-700 uppercase tracking-wider text-[9px] mt-2 transition-all">➕ Añadir al Carrito</button>
                     </div>
@@ -162,11 +161,9 @@
             return new Date(valor);
         }
 
-        // Genera subcampos dinámicamente según la cantidad especificada
         function generarCamposCredenciales() {
             const contenedor = document.getElementById('contenedorCredencialesDinamicas');
             const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
-            
             if (cantidad < 1) return;
             
             let html = "";
@@ -201,7 +198,6 @@
             const inputsPerfil = document.querySelectorAll('.perfil-dinamica');
             const inputsPin = document.querySelectorAll('.pin-dinamica');
 
-            // Insertamos cada una de las unidades especificadas al carrito global de forma ordenada
             for (let i = 0; i < cantidad; i++) {
                 const clave = inputsClave[i] ? inputsClave[i].value.trim() : "";
                 const perfil = (inputsPerfil[i] && inputsPerfil[i].value.trim()) ? inputsPerfil[i].value.trim() : 'N/A';
@@ -224,8 +220,6 @@
             }
 
             actualizarVistaCarrito();
-
-            // Limpiar campos de configuración limpios
             document.getElementById('cantidad').value = 1;
             document.getElementById('costo').value = '';
             document.getElementById('precio').value = '';
@@ -296,6 +290,14 @@
                 let clse = dias <= 0 ? "status-red" : (dias <= 3 ? "status-yellow" : "status-green");
                 let fechaTxt = isNaN(fechaV.getTime()) ? "ERROR" : fechaV.toISOString().split('T')[0];
 
+                // Adaptar dinámicamente el botón de cobro si ya está vencido
+                let botonCobro = "";
+                if (dias <= 0) {
+                    botonCobro = `<button onclick="wsNotificarVencido('${c[0]}')" class="bg-red-600 hover:bg-red-500 px-3 py-1.5 rounded font-black uppercase shadow-md transition-colors">⚠️ Corte</button>`;
+                } else {
+                    botonCobro = `<button onclick="wsCobroAviso('${c[0]}')" class="bg-green-600 hover:bg-green-500 px-3 py-1.5 rounded font-black uppercase shadow-md transition-colors">Cobro</button>`;
+                }
+
                 html += `
                     <tr class="hover:bg-slate-800/40 border-b border-slate-800/50 transition-colors">
                         <td class="p-4 text-blue-400 font-bold uppercase">${c[1]}<br><span class="text-slate-500 font-black text-[10px]">${c[3]}</span></td>
@@ -308,7 +310,7 @@
                         <td class="p-4 text-center space-x-1">
                             <button onclick="wsAcceso('${c[0]}')" class="bg-blue-600 px-3 py-1.5 rounded font-black uppercase shadow-md">Entrega</button>
                             <button onclick="renovar('${c[0]}')" class="bg-indigo-600 px-3 py-1.5 rounded font-black uppercase shadow-md">Renovar</button>
-                            <button onclick="wsCobro('${c[0]}')" class="bg-green-600 px-3 py-1.5 rounded font-black uppercase shadow-md">Cobro</button>
+                            ${botonCobro}
                         </td>
                         <td class="p-4 text-center"><button onclick="eliminar('${c[0]}')" class="text-slate-700 hover:text-red-500 font-bold text-lg">✖</button></td>
                     </tr>`;
@@ -339,7 +341,6 @@
                 return;
             }
 
-            // Agrupación limpia para enviarle los datos consolidados a la hoja de Google Sheets
             let listaNombresApps = [];
             let totalCosto = 0;
             let totalPrecio = 0;
@@ -348,7 +349,6 @@
             let listaPerfiles = [];
             let listaPins = [];
 
-            // Mapeamos el carrito
             carritoServicios.forEach(item => {
                 listaNombresApps.push(item.servicio);
                 totalCosto += item.costo;
@@ -423,10 +423,60 @@
             abrirWS(c[2], msj);
         }
 
-        function wsCobro(id) {
+        // PULIDO: Mensaje de Cobro / Recordatorio (3 días o menos por vencer)
+        function wsCobroAviso(id) {
             const c = clientesGlobal.find(x => x[0] == id);
             const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
-            const msj = "Hola *" + c[1] + "*, te saludamos de *Streaming Planet*. Tu servicio de *" + c[3] + "* vence el (" + fechaV + "). 📅 ¿Deseas renovar?";
+            
+            const apps = c[3].toString().split(" + ");
+            const correos = c[6].toString().split(" | ");
+
+            let msj = `⏰ *RECORDATORIO DE PAGO - ${c[1]}* 🗓️\n`;
+            msj += `Hola, te saludamos de *Streaming Planet*. Esperamos que estés disfrutando tu programación. ✨\n\n`;
+            msj += `Te notificamos que el siguiente servicio está próximo a vencer:\n`;
+            
+            const sep = "------------------------------";
+            msj += `${sep}\n`;
+
+            // Listar cada app con su respectivo correo para orientar al vendedor/cliente
+            apps.forEach((app, index) => {
+                const correoActual = correos[index] || correos[0];
+                msj += `📺 *Plataforma:* ${app}\n`;
+                msj += `✉️ *Cuenta:* ${correoActual}\n\n`;
+            });
+
+            msj += `${sep}\n`;
+            msj += `📅 *Fecha de vencimiento:* ${fechaV}\n\n`;
+            msj += `💬 ¿Deseas renovar tu pantalla para mantener activo tu perfil sin interrupciones? Quedamos atentos a tu respuesta. ⚡`;
+            
+            abrirWS(c[2], msj);
+        }
+
+        // PULIDO: Mensaje Especial cuando ya está VENCIDO
+        function wsNotificarVencido(id) {
+            const c = clientesGlobal.find(x => x[0] == id);
+            const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
+            
+            const apps = c[3].toString().split(" + ");
+            const correos = c[6].toString().split(" | ");
+
+            let msj = `⚠️ *AVISO DE VENCIMIENTO - ${c[1]}* 🚫\n`;
+            msj += `Hola, te saludamos de *Streaming Planet*. Nos comunicamos contigo para informarte que tu suscripción ha caducado.\n\n`;
+            msj += `Detalle del servicio vencido:\n`;
+            
+            const sep = "------------------------------";
+            msj += `${sep}\n`;
+
+            apps.forEach((app, index) => {
+                const correoActual = correos[index] || correos[0];
+                msj += `❌ *Plataforma:* ${app}\n`;
+                msj += `✉️ *Cuenta:* ${correoActual}\n\n`;
+            });
+
+            msj += `${sep}\n`;
+            msj += `📅 *Venció el día:* ${fechaV}\n\n`;
+            msj += `📢 *Nota:* El acceso a la cuenta ha sido suspendido temporalmente. Si deseas reactivar el servicio y conservar tu mismo perfil de reproducción, avísanos para procesar tu renovación de inmediato. 🚀`;
+            
             abrirWS(c[2], msj);
         }
 
@@ -438,7 +488,7 @@
 
         window.onload = function() {
             cargarDatos();
-            generarCamposCredenciales(); // Ejecución inicial
+            generarCamposCredenciales();
         };
     </script>
 </body>
