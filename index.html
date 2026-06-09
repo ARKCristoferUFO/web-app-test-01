@@ -213,4 +213,293 @@
             const inputsPerfil = document.querySelectorAll('.perfil-dinamica');
             const inputsPin = document.querySelectorAll('.pin-dinamica');
 
-            for (let i = 0; i
+            for (let i = 0; i < cantidad; i++) {
+                const clave = inputsClave[i] ? inputsClave[i].value.trim() : "";
+                const perfil = (inputsPerfil[i] && inputsPerfil[i].value.trim()) ? inputsPerfil[i].value.trim() : 'N/A';
+                const pin = (inputsPin[i] && inputsPin[i].value.trim()) ? inputsPin[i].value.trim() : 'N/A';
+
+                if (!clave) {
+                    alert(`Falta rellenar la contraseña para la cuenta número ${i + 1}`);
+                    return;
+                }
+
+                carritoServicios.push({
+                    servicio: servicio,
+                    costo: costoUnitario,
+                    precio: precioUnitario,
+                    correo: correoBase,
+                    clave: clave,
+                    perfil: perfil,
+                    pin: pin
+                });
+            }
+
+            actualizarVistaCarrito();
+            document.getElementById('cantidad').value = 1;
+            document.getElementById('costo').value = '';
+            document.getElementById('precio').value = '';
+            document.getElementById('correo').value = '';
+            generarCamposCredenciales();
+        }
+
+        function quitarDelCarrito(index) {
+            carritoServicios.splice(index, 1);
+            actualizarVistaCarrito();
+        }
+
+        function actualizarVistaCarrito() {
+            const contenedor = document.getElementById('listaCarrito');
+            const contador = document.getElementById('cuentaCarrito');
+            contador.innerText = carritoServicios.length;
+
+            if (carritoServicios.length === 0) {
+                contenedor.innerHTML = 'Ningún servicio añadido aún.';
+                return;
+            }
+
+            let html = "";
+            carritoServicios.forEach((item, index) => {
+                html += `
+                    <div class="flex justify-between items-center bg-slate-800/60 p-1.5 rounded border border-slate-700/50 font-bold text-white uppercase text-[10px]">
+                        <div>
+                            <span class="text-blue-400">${item.servicio}</span> 
+                            <span class="text-slate-400 text-[9px] font-normal">(${item.perfil})</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-green-400">$${item.precio.toFixed(2)}</span>
+                            <button type="button" onclick="quitarDelCarrito(${index})" class="text-red-400 hover:text-red-600 px-1">✖</button>
+                        </div>
+                    </div>
+                `;
+            });
+            contenedor.innerHTML = html;
+        }
+
+        function renderizarTabla() {
+            const tabla = document.getElementById('cuerpoTabla');
+            const busqueda = document.getElementById('buscador').value.toLowerCase();
+            const hoy = new Date(); hoy.setHours(0,0,0,0);
+            let vDia = 0, cDia = 0, uMes = 0, uAnio = 0;
+
+            let filtrados = clientesGlobal.filter(c => 
+                c[1].toString().toLowerCase().includes(busqueda) || 
+                c[3].toString().toLowerCase().includes(busqueda)
+            );
+
+            let html = "";
+            filtrados.forEach(c => {
+                const fechaV = procesarFecha(c[10]);
+                const diff = fechaV.getTime() - hoy.getTime();
+                const dias = Math.ceil(diff / (1000 * 60 * 60 * 24));
+                const fReg = new Date(parseInt(c[0]));
+                const costoItem = parseFloat(c[4]) || 0;
+                const ventaItem = parseFloat(c[5]) || 0;
+                const gan = ventaItem - costoItem;
+
+                if(!isNaN(fReg.getTime())) {
+                    if(fReg.toDateString() === hoy.toDateString()) { vDia += ventaItem; cDia += costoItem; }
+                    if(fReg.getMonth() === hoy.getMonth() && fReg.getFullYear() === 2026) uMes += gan;
+                    if(fReg.getFullYear() === 2026) uAnio += gan;
+                }
+
+                let clse = dias <= 0 ? "status-red" : (dias <= 3 ? "status-yellow" : "status-green");
+                let fechaTxt = isNaN(fechaV.getTime()) ? "ERROR" : fechaV.toISOString().split('T')[0];
+
+                let botonCobro = "";
+                if (dias <= 0) {
+                    botonCobro = `<button onclick="wsNotificarVencido('${c[0]}')" class="bg-red-600 hover:bg-red-500 px-3 py-1.5 rounded font-black uppercase shadow-md transition-colors">⚠️ Corte</button>`;
+                } else {
+                    botonCobro = `<button onclick="wsCobroAviso('${c[0]}')" class="bg-green-600 hover:bg-green-500 px-3 py-1.5 rounded font-black uppercase shadow-md transition-colors">Cobro</button>`;
+                }
+
+                html += `
+                    <tr class="hover:bg-slate-800/40 border-b border-slate-800/50 transition-colors">
+                        <td class="p-4 text-blue-400 font-bold uppercase">${c[1]}<br><span class="text-slate-500 font-black text-[10px]">${c[3]}</span></td>
+                        <td class="p-4 text-center">
+                            <span class="px-2 py-1 rounded-full border font-black ${clse}">
+                                ${dias <= 0 ? 'VENCIDO' : dias + ' DIAS'}
+                            </span>
+                        </td>
+                        <td class="p-4 text-center text-slate-500 font-mono">${fechaTxt}</td>
+                        <td class="p-4 text-center space-x-1">
+                            <button onclick="wsAcceso('${c[0]}')" class="bg-blue-600 px-3 py-1.5 rounded font-black uppercase shadow-md">Entrega</button>
+                            <button onclick="renovar('${c[0]}')" class="bg-indigo-600 px-3 py-1.5 rounded font-black uppercase shadow-md">Renovar</button>
+                            ${botonCobro}
+                        </td>
+                        <td class="p-4 text-center"><button onclick="eliminar('${c[0]}')" class="text-slate-700 hover:text-red-500 font-bold text-lg">✖</button></td>
+                    </tr>`;
+            });
+
+            tabla.innerHTML = html || '<tr><td colspan="5" class="p-10 text-center">Sin resultados</td></tr>';
+            
+            document.getElementById('gananciaDia').innerText = `$${vDia.toFixed(2)}`;
+            document.getElementById('costoDia').innerText = `$${cDia.toFixed(2)}`;
+            document.getElementById('netoDia').innerText = `$${(vDia - cDia).toFixed(2)}`;
+            document.getElementById('gananciaMes').innerText = `$${uMes.toFixed(2)}`;
+            document.getElementById('gananciaAnio').innerText = `$${uAnio.toFixed(2)}`;
+        }
+
+        async function guardarEnGoogle() {
+            const nombre = document.getElementById('nombre').value.toUpperCase().trim();
+            const telefono = document.getElementById('telefono').value.trim();
+            const vencimiento = document.getElementById('vencimiento').value;
+            const btn = document.getElementById('btnGuardar');
+
+            if (!nombre || !telefono || !vencimiento) {
+                alert("Por favor rellena Nombre, WhatsApp y Fecha de Vencimiento.");
+                return;
+            }
+
+            if (carritoServicios.length === 0) {
+                alert("Debes añadir al menos 1 servicio al carrito antes de guardar.");
+                return;
+            }
+
+            let listaNombresApps = [];
+            let totalCosto = 0;
+            let totalPrecio = 0;
+            let listaCorreos = [];
+            let listaClaves = [];
+            let listaPerfiles = [];
+            let listaPins = [];
+
+            carritoServicios.forEach(item => {
+                listaNombresApps.push(item.servicio);
+                totalCosto += item.costo;
+                totalPrecio += item.precio;
+                listaCorreos.push(item.correo);
+                listaClaves.push(item.clave);
+                listaPerfiles.push(item.perfil);
+                listaPins.push(item.pin);
+            });
+
+            const data = {
+                id: Date.now(),
+                nombre: nombre,
+                telefono: telefono,
+                servicio: listaNombresApps.join(" + "), 
+                costo: totalCosto,
+                precio: totalPrecio,
+                correo: listaCorreos.join(" | "), 
+                clave: listaClaves.join(" | "),
+                perfil: listaPerfiles.join(" | "),
+                pin: listaPins.join(" | "),
+                vencimiento: vencimiento
+            };
+
+            btn.innerText = "ESPERE...";
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+            location.reload();
+        }
+
+        async function renovar(id) {
+            if(!confirm("¿Renovar?")) return;
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'RENEW', id: id }) });
+            location.reload();
+        }
+
+        async function eliminar(id) {
+            if(!confirm("¿Eliminar?")) return;
+            await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: 'DELETE', id: id }) });
+            location.reload();
+        }
+
+        function wsAcceso(id) {
+            const c = clientesGlobal.find(x => x[0] == id);
+            const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
+            
+            const apps = c[3].toString().split(" + ");
+            const correos = c[6].toString().split(" | ");
+            const claves = c[7].toString().split(" | ");
+            const perfiles = c[8].toString().split(" | ");
+            const pins = c[9].toString().split(" | ");
+
+            let msj = `🚀 *SERVICIOS ACTIVOS - ${c[1]}* ⭐\n`;
+            msj += `Gracias por tu compra en Planet Streaming\n\n`;
+            
+            const sep = "------------------------------";
+
+            apps.forEach((app, index) => {
+                msj += `${sep}\n`;
+                msj += `📺 *SERVICIO:* ${app}\n`;
+                msj += `✉️ *Usuario:* ${correos[index] || correos[0]}\n`;
+                msj += `🔑 *Clave:* ${claves[index] || claves[0]}\n`;
+                msj += `👤 *Perfil:* ${perfiles[index] || 'N/A'}\n`;
+                msj += `🔐 *PIN:* ${pins[index] || 'N/A'}\n`;
+            });
+
+            msj += `${sep}\n\n🗓️ *Vence:* ${fechaV}\n\n`;
+            msj += `🚨 *REGLAS IMPORTANTES*:\n`;
+            msj += `* No cambiar datos de la cuenta.\n`;
+            msj += `* Usar solo el perfil asignado.\n`;
+            msj += `* Disfruta tu programación 🍿`;
+            
+            abrirWS(c[2], msj);
+        }
+
+        function wsCobroAviso(id) {
+            const c = clientesGlobal.find(x => x[0] == id);
+            const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
+            const apps = c[3].toString().split(" + ");
+            const correos = c[6].toString().split(" | ");
+
+            let msj = `⏰ *RECORDATORIO DE PAGO - ${c[1]}* 🗓️\n`;
+            msj += `Hola, te saludamos de *Planet Streaming*. Esperamos que estés disfrutando tu programación. ✨\n\n`;
+            msj += `Te notificamos que el siguiente servicio está próximo a vencer:\n`;
+            
+            const sep = "------------------------------";
+            msj += `${sep}\n`;
+
+            apps.forEach((app, index) => {
+                const correoActual = correos[index] || correos[0];
+                msj += `📺 *Plataforma:* ${app}\n`;
+                msj += `✉️ *Cuenta:* ${correoActual}\n\n`;
+            });
+
+            msj += `${sep}\n`;
+            msj += `📅 *Fecha de vencimiento:* ${fechaV}\n\n`;
+            msj += `💬 ¿Deseas renovar tu pantalla para mantener activo tu perfil sin interrupciones? Quedamos atentos a tu respuesta. ⚡`;
+            
+            abrirWS(c[2], msj);
+        }
+
+        function wsNotificarVencido(id) {
+            const c = clientesGlobal.find(x => x[0] == id);
+            const fechaV = procesarFecha(c[10]).toISOString().split('T')[0];
+            const apps = c[3].toString().split(" + ");
+            const correos = c[6].toString().split(" | ");
+
+            let msj = `⚠️ *AVISO DE VENCIMIENTO - ${c[1]}* 🚫\n`;
+            msj += `Hola, te saludamos de *Planet Streaming*. Nos comunicamos contigo para informarte que tu suscripción ha caducado.\n\n`;
+            msj += `Detalle del servicio vencido:\n`;
+            
+            const sep = "------------------------------";
+            msj += `${sep}\n`;
+
+            apps.forEach((app, index) => {
+                const correoActual = correos[index] || correos[0];
+                msj += `❌ *Plataforma:* ${app}\n`;
+                msj += `✉️ *Cuenta:* ${correoActual}\n\n`;
+            });
+
+            msj += `${sep}\n`;
+            msj += `📅 *Venció el día:* ${fechaV}\n\n`;
+            msj += `📢 *Nota:* El acceso a la cuenta ha sido suspendido temporalmente. Si deseas reactivar el servicio y conservar tu mismo perfil de reproducción, avísanos para procesar tu renovación de inmediato. 🚀`;
+            
+            abrirWS(c[2], msj);
+        }
+
+        function abrirWS(tel, msj) {
+            const fTel = tel.toString().replace(/\D/g, '');
+            const msjFinal = encodeURIComponent(msj);
+            window.open("https://api.whatsapp.com/send?phone=" + fTel + "&text=" + msjFinal, "_blank");
+        }
+
+        window.onload = function() {
+            cargarDatos();
+            establecerFecha30Dias();
+            generarCamposCredenciales();
+        };
+    </script>
+</body>
+</html>
